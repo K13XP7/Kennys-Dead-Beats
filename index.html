@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenny's Dead Beats - Management Simulation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header / Statusleiste -->
+        <header class="top-header">
+            <div class="logo">KENNY'S DEAD BEATS</div>
+            <div class="stats">
+                <span class="stat-item">Geld: <strong id="money-display">1450,00 €</strong></span>
+                <span class="stat-item">Tag: <strong id="day-display">Montag</strong></span>
+            </div>
+            <button id="next-day-btn" class="btn-primary">WEITER ➔</button>
+        </header>
+
+        <!-- Hauptbereich / Dashboard -->
+        <main class="dashboard-content">
+            <aside class="sidebar">
+                <nav>
+                    <ul>
+                        <li class="active">Übersicht</li>
+                        <li>DJs & Roster</li>
+                        <li>Club-Events</li>
+                        <li>Finanzen</li>
+                    </ul>
+                </nav>
+            </aside>
+            <section class="main-panel">
+                <h2>Dashboard Overview</h2>
+                <div class="cards-grid">
+                    <div class="card">
+                        <h3>Aktueller Status</h3>
+                        <p id="status-text">Bereite das Wochenende vor. Buche DJs und wähle die Setlists.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Wochen-News</h3>
+                        <p>Keine neuen Mitteilungen.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
