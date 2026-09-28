@@ -47,6 +47,36 @@ const gameState = {
             cost: 1950.00,
             description: "Altes Fabrikgelände im Gutleutviertel. Mehrere düstere Floors für große Schwarze Nächte."
         }
+    ],
+    // Verfügbare Anfragen von fremden Veranstaltern
+    gigRequests: [
+        {
+            id: "gig-1",
+            title: "Darkwave Night @ Caveau Mainz",
+            genre: "Darkwave & Postpunk",
+            day: "Freitag",
+            fee: 180.00,
+            accepted: false,
+            declined: false
+        },
+        {
+            id: "gig-2",
+            title: "Industrial Noise Mass @ Stengelvilla Offenbach",
+            genre: "Harsh EBM / Industrial",
+            day: "Samstag",
+            fee: 250.00,
+            accepted: false,
+            declined: false
+        },
+        {
+            id: "gig-3",
+            title: "Gothic Classics @ Final Darkness",
+            genre: "80s Goth & Batcave",
+            day: "Samstag",
+            fee: 210.00,
+            accepted: false,
+            declined: false
+        }
     ]
 };
 
@@ -57,6 +87,7 @@ const nextDayBtn = document.getElementById("next-day-btn");
 const statusText = document.getElementById("status-text");
 const bookedLocationText = document.getElementById("booked-location-text");
 const locationsListContainer = document.getElementById("locations-list");
+const gigRequestsListContainer = document.getElementById("gig-requests-list");
 
 // Tab-Steuerung
 const navItems = document.querySelectorAll(".nav-item");
@@ -73,6 +104,73 @@ navItems.forEach(item => {
         document.getElementById(`tab-${targetTab}`).classList.add("active");
     });
 });
+
+// Nachrichten / Gig-Anfragen rendern
+function renderGigRequests() {
+    gigRequestsListContainer.innerHTML = "";
+
+    gameState.gigRequests.forEach(gig => {
+        const card = document.createElement("div");
+        card.className = "card gig-card";
+
+        if (gig.accepted) {
+            card.innerHTML = `
+                <h4>${gig.title}</h4>
+                <p><strong>Tag:</strong> ${gig.day}</p>
+                <p><span class="badge-success">Zugesagt ✓ (+${gig.fee.toFixed(2)} € am ${gig.day})</span></p>
+            `;
+        } else if (gig.declined) {
+            card.innerHTML = `
+                <h4>${gig.title}</h4>
+                <p><span class="badge-muted">Abgelehnt ✗</span></p>
+            `;
+        } else {
+            card.innerHTML = `
+                <h4>${gig.title}</h4>
+                <p><strong>Genre:</strong> ${gig.genre}</p>
+                <p><strong>Wochentag:</strong> ${gig.day}</p>
+                <p><strong>Gage:</strong> <span class="fee-text">${gig.fee.toFixed(2)} €</span></p>
+                <div class="gig-actions">
+                    <button class="btn-primary accept-gig-btn" data-id="${gig.id}">Annehmen</button>
+                    <button class="btn-secondary decline-gig-btn" data-id="${gig.id}">Ablehnen</button>
+                </div>
+            `;
+        }
+
+        gigRequestsListContainer.appendChild(card);
+    });
+
+    // Event-Listener für Gig-Buttons
+    document.querySelectorAll(".accept-gig-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const gigId = e.target.getAttribute("data-id");
+            acceptGig(gigId);
+        });
+    });
+
+    document.querySelectorAll(".decline-gig-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const gigId = e.target.getAttribute("data-id");
+            declineGig(gigId);
+        });
+    });
+}
+
+function acceptGig(gigId) {
+    const gig = gameState.gigRequests.find(g => g.id === gigId);
+    if (gig) {
+        gig.accepted = true;
+        updateUI();
+    }
+}
+
+function declineGig(gigId) {
+    const gig = gameState.gigRequests.find(g => g.id === gigId);
+    if (gig) {
+        gig.declined = true;
+        updateUI();
+    }
+}
 
 // Locations rendern
 function renderLocations() {
@@ -111,7 +209,7 @@ function renderLocations() {
     });
 }
 
-// Location buchen Funktion
+// Location buchen
 function bookLocation(locId) {
     const loc = gameState.locations.find(l => l.id === locId);
     if (loc && gameState.money >= loc.cost) {
@@ -130,7 +228,7 @@ function updateUI() {
     if (gameState.bookedLocation) {
         bookedLocationText.innerHTML = `<strong>${gameState.bookedLocation.name}</strong> (Max. ${gameState.bookedLocation.capacity} Gäste)`;
     } else {
-        bookedLocationText.innerText = "Aktuell keine Location für diese Woche gebucht.";
+        bookedLocationText.innerText = "Aktuell keine eigene Location für diese Woche gebucht.";
     }
 
     if (gameState.currentDayIndex === 4 || gameState.currentDayIndex === 5) {
@@ -138,19 +236,35 @@ function updateUI() {
         statusText.innerText = "Das Wochenende bricht an! Die Schattenwelten erwachen.";
     } else {
         nextDayBtn.innerText = "WEITER ➔";
-        statusText.innerText = "Bereite das Wochenende vor. Buche eine Location und passende DJs.";
+        statusText.innerText = "Bereite das Wochenende vor. Nimm DJ-Gigs an oder buche eine eigene Location.";
     }
 
+    renderGigRequests();
     renderLocations();
 }
 
-// Event-Listener für Weiter-Button
+// Weiter-Button Logik mit Auszahlung der zugesagten Gigs
 nextDayBtn.addEventListener("click", () => {
+    const currentDay = gameState.days[gameState.currentDayIndex];
+
+    // Auszahlung für zugesagte Gigs am jeweiligen Tag
+    gameState.gigRequests.forEach(gig => {
+        if (gig.accepted && gig.day === currentDay) {
+            gameState.money += gig.fee;
+            alert(`🎧 Du hast am ${currentDay} auf der '${gig.title}' aufgelegt und ${gig.fee.toFixed(2)} € Honorar kassiert!`);
+        }
+    });
+
     gameState.currentDayIndex = (gameState.currentDayIndex + 1) % gameState.days.length;
     
-    // Nach dem Wochenende (Montag) wird die Buchung für die neue Woche zurückgesetzt
+    // Montag: Neue Woche / Reset
     if (gameState.currentDayIndex === 0) {
         gameState.bookedLocation = null;
+        // Gigs zurücksetzen
+        gameState.gigRequests.forEach(g => {
+            g.accepted = false;
+            g.declined = false;
+        });
     }
 
     updateUI();
