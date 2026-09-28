@@ -6,25 +6,46 @@ const gameState = {
     bookedLocation: null,
     locations: [
         {
-            id: "basement",
-            name: "Der Kellerclub",
-            capacity: 150,
-            cost: 300.00,
-            description: "Dreckig, laut, intim. Perfekt für die ersten kleinen Underground-Partys."
+            id: "ponyhof",
+            name: "Ponyhof (FFM-Sachsenhausen)",
+            capacity: 120,
+            cost: 220.00,
+            description: "Gemütlicher Gewölbekeller Klappergasse. Perfekt für intime Post-Punk & Coldwave Abende."
         },
         {
-            id: "warehouse",
-            name: "Alte Lagerhalle",
-            capacity: 500,
+            id: "kreativfabrik",
+            name: "Kreativfabrik (Wiesbaden)",
+            capacity: 200,
+            cost: 380.00,
+            description: "Roher DIY-Charme direkt am Schlachthof-Gelände. Bekannt für Obscure Wave & Minimal Synth."
+        },
+        {
+            id: "nachtleben",
+            name: "Nachtleben (FFM Innenstadt)",
+            capacity: 280,
+            cost: 550.00,
+            description: "Kult-Gothic-Keller an der Konstablerwache. Heimat von EBM, Batcave & Darkwave Partys."
+        },
+        {
+            id: "dasbett",
+            name: "Das BETT (FFM-Gallus)",
+            capacity: 400,
             cost: 850.00,
-            description: "Industrie-Charm mit viel Platz und robuster Anlage."
+            description: "Bühne für Düster-Konzerte & schwarze Partys mit sattem Sound und düsterem Vibe."
         },
         {
-            id: "kulturbahnhof",
-            name: "Kulturbahnhof",
-            capacity: 1200,
-            cost: 2200.00,
-            description: "Renommierte Event-Location mit professioneller Licht- & Sound-Anlage."
+            id: "kesselhaus",
+            name: "Kesselhaus / Schlachthof (Wiesbaden)",
+            capacity: 500,
+            cost: 1250.00,
+            description: "Industrieller Backstein-Look mit hoher Decke. Ideal für harten EBM, Industrial & Goth-Rock."
+        },
+        {
+            id: "milchsack",
+            name: "Tanzhaus West / Milchsackfabrik (FFM)",
+            capacity: 900,
+            cost: 1950.00,
+            description: "Altes Fabrikgelände im Gutleutviertel. Mehrere düstere Floors für große Schwarze Nächte."
         }
     ]
 };
@@ -67,7 +88,7 @@ function renderLocations() {
             <div>
                 <h3>${loc.name}</h3>
                 <p>${loc.description}</p>
-                <p><strong>Kapazität:</strong> ${loc.capacity} Personen</p>
+                <p><strong>Max. Kapazität:</strong> ${loc.capacity} Personen</p>
                 <p><strong>Miete/Wochenende:</strong> ${loc.cost.toFixed(2)} €</p>
             </div>
             <div class="card-action">
@@ -113,8 +134,8 @@ function updateUI() {
     }
 
     if (gameState.currentDayIndex === 4 || gameState.currentDayIndex === 5) {
-        nextDayBtn.innerText = "PARTY STARTEN 🎧";
-        statusText.innerText = "Das Wochenende ist da! Die Partys laufen.";
+        nextDayBtn.innerText = "PARTY STARTEN 🦇";
+        statusText.innerText = "Das Wochenende bricht an! Die Schattenwelten erwachen.";
     } else {
         nextDayBtn.innerText = "WEITER ➔";
         statusText.innerText = "Bereite das Wochenende vor. Buche eine Location und passende DJs.";
