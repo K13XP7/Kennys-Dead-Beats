@@ -3,82 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goth & Industrial Nightlife Manager</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Kenny's Dead Beats - Management Simulation</title>
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
-
-    <!-- Header / Top Bar -->
-    <header class="top-bar">
-        <h1>Goth & Industrial Manager</h1>
-        <div class="stats">
-            <div class="stat-item">
-                <span class="stat-label">Tag:</span>
-                <span id="day-display">Montag</span>
+    <div id="app">
+        <!-- Header / Statusleiste -->
+        <header class="top-header">
+            <div class="logo">KENNY'S DEAD BEATS</div>
+            <div class="stats">
+                <span class="stat-item">Geld: <strong id="money-display">1450,00 €</strong></span>
+                <span class="stat-item">Tag: <strong id="day-display">Montag</strong></span>
             </div>
-            <div class="stat-item">
-                <span class="stat-label">Budget:</span>
-                <span id="money-display" class="money">1450.00 €</span>
-            </div>
-            <button id="next-day-btn" class="btn-secondary">WEITER ➔</button>
-        </div>
-    </header>
+            <button id="next-day-btn" class="btn-primary">WEITER ➔</button>
+        </header>
 
-    <!-- Main Container: 2-Spalten-Layout (Links: Anfragen/Nachrichten, Rechts: Dashboard & Tabs) -->
-    <div class="main-layout">
-        
-        <!-- Linke Seite: Nachrichtenzentrale / DJ-Gigs -->
-        <aside class="sidebar-messages">
-            <h2>🦇 DJ-Anfragen & Gigs</h2>
-            <p class="sidebar-subtext">Veranstaltungen, für die du als DJ angefragt wirst:</p>
-            <div id="gig-requests-list" class="gig-list">
-                <!-- Dynamisch generierte Anfragen -->
-            </div>
-        </aside>
-
-        <!-- Rechte Seite: Hauptspiel-Bereich mit Tabs -->
-        <main class="content-area">
+        <!-- Hauptbereich / Dashboard -->
+        <main class="dashboard-content">
+            <aside class="sidebar">
+                <nav>
+                    <ul>
+                        <li class="nav-item active" data-tab="overview">Übersicht</li>
+                        <li class="nav-item" data-tab="messages">Nachrichten ✉</li>
+                        <li class="nav-item" data-tab="locations">Locations</li>
+                        <li class="nav-item" data-tab="djs">DJs & Roster</li>
+                        <li class="nav-item" data-tab="events">Club-Events</li>
+                        <li class="nav-item" data-tab="finances">Finanzen</li>
+                    </ul>
+                </nav>
+            </aside>
             
-            <!-- Tab Navigation -->
-            <nav class="tabs-nav">
-                <button class="nav-item active" data-tab="dashboard">Dashboard</button>
-                <button class="nav-item" data-tab="locations">Locations</button>
-                <button class="nav-item" data-tab="roster">DJs & Lineup</button>
-                <button class="nav-item" data-tab="finances">Finanzen</button>
-            </nav>
-
-            <!-- Tab Inhalt: Dashboard -->
-            <section id="tab-dashboard" class="tab-content active">
-                <div class="card">
-                    <h2>Wochen-Status</h2>
-                    <p id="status-text">Bereite das Wochenende vor. Nimm DJ-Gigs an oder buche eine eigene Location.</p>
+            <section class="main-panel">
+                <!-- Tab 1: Übersicht -->
+                <div id="tab-overview" class="tab-content active">
+                    <h2>Dashboard Overview</h2>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <h3>Aktueller Status</h3>
+                            <p id="status-text">Bereite das Wochenende vor. Nimm DJ-Anfragen an oder buche eine eigene Location.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Gebuchte Location</h3>
+                            <p id="booked-location-text">Aktuell keine Location für diese Woche gebucht.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card">
-                    <h2>Gebuchte eigene Location</h2>
-                    <p id="booked-location-text">Aktuell keine eigene Location für diese Woche gebucht.</p>
+
+                <!-- Tab 2: Nachrichten (DJ-Gigs) -->
+                <div id="tab-messages" class="tab-content">
+                    <h2>Nachrichten & DJ-Anfragen 🦇</h2>
+                    <p class="section-desc">Veranstaltungen anderer Clubs, auf denen du auflegen und Honorar verdienen kannst:</p>
+                    <div id="gig-requests-list" class="cards-grid">
+                        <!-- Wird dynamisch per JS befüllt -->
+                    </div>
+                </div>
+
+                <!-- Tab 3: Locations -->
+                <div id="tab-locations" class="tab-content">
+                    <h2>Verfügbare Locations</h2>
+                    <p class="section-desc">Wähle eine passende Location für deine nächste Party aus:</p>
+                    <div id="locations-list" class="cards-grid">
+                        <!-- Wird dynamisch per JS befüllt -->
+                    </div>
+                </div>
+
+                <!-- Tab 4: DJs -->
+                <div id="tab-djs" class="tab-content">
+                    <h2>DJs & Roster</h2>
+                    <p class="section-desc">Hier kannst du bald DJs verwalten und unter Vertrag nehmen.</p>
+                </div>
+
+                <!-- Tab 5: Events -->
+                <div id="tab-events" class="tab-content">
+                    <h2>Club-Events</h2>
+                    <p class="section-desc">Planung deiner kommenden Events.</p>
+                </div>
+
+                <!-- Tab 6: Finanzen -->
+                <div id="tab-finances" class="tab-content">
+                    <h2>Finanzen</h2>
+                    <p class="section-desc">Detaillierte Einnahmen und Ausgaben.</p>
                 </div>
             </section>
-
-            <!-- Tab Inhalt: Locations -->
-            <section id="tab-locations" class="tab-content">
-                <h2>Rhein-Main Szene-Locations</h2>
-                <div id="locations-list" class="grid-container">
-                    <!-- Dynamische Locations -->
-                </div>
-            </section>
-
-            <!-- Tab Inhalt: DJs & Lineup -->
-            <section id="tab-roster" class="tab-content">
-                <h2>Lineup & Fremd-DJs</h2>
-                <p>Demnächst verfügbar: DJs für dein eigenes Event buchen.</p>
-            </section>
-
-            <!-- Tab Inhalt: Finanzen -->
-            <section id="tab-finances" class="tab-content">
-                <h2>Finanzübersicht</h2>
-                <p>Demnächst verfügbar: Einnahmen- und Ausgabenhistorie.</p>
-            </section>
-
         </main>
     </div>
 
