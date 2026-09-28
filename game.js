@@ -88,7 +88,7 @@ const bookedLocationText = document.getElementById("booked-location-text");
 const locationsListContainer = document.getElementById("locations-list");
 const gigRequestsListContainer = document.getElementById("gig-requests-list");
 
-// Tab-Steuerung
+// Linke Navigation / Tabs Umschalten
 const navItems = document.querySelectorAll(".nav-item");
 const tabContents = document.querySelectorAll(".tab-content");
 
@@ -104,7 +104,7 @@ navItems.forEach(item => {
     });
 });
 
-// Nachrichten / Gig-Anfragen rendern
+// DJ-Anfragen im Karten-Design rendern
 function renderGigRequests() {
     gigRequestsListContainer.innerHTML = "";
 
@@ -139,7 +139,7 @@ function renderGigRequests() {
         gigRequestsListContainer.appendChild(card);
     });
 
-    // Event-Listener für Gig-Buttons
+    // Button Listener
     document.querySelectorAll(".accept-gig-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
             const gigId = e.target.getAttribute("data-id");
@@ -199,7 +199,6 @@ function renderLocations() {
         locationsListContainer.appendChild(card);
     });
 
-    // Event Listener für Buchen-Buttons
     document.querySelectorAll(".book-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
             const locId = e.target.getAttribute("data-id");
@@ -208,7 +207,6 @@ function renderLocations() {
     });
 }
 
-// Location buchen
 function bookLocation(locId) {
     const loc = gameState.locations.find(l => l.id === locId);
     if (loc && gameState.money >= loc.cost) {
@@ -218,7 +216,7 @@ function bookLocation(locId) {
     }
 }
 
-// UI-Update Funktion
+// UI Aktualisieren
 function updateUI() {
     moneyDisplay.innerText = `${gameState.money.toFixed(2)} €`;
     const dayName = gameState.days[gameState.currentDayIndex];
@@ -242,11 +240,10 @@ function updateUI() {
     renderLocations();
 }
 
-// Weiter-Button Logik
+// Weiter-Button (Tage weiterschalten & Geld auszahlen)
 nextDayBtn.addEventListener("click", () => {
     const currentDay = gameState.days[gameState.currentDayIndex];
 
-    // Auszahlung für zugesagte Gigs am jeweiligen Tag
     gameState.gigRequests.forEach(gig => {
         if (gig.accepted && gig.day === currentDay) {
             gameState.money += gig.fee;
@@ -256,7 +253,6 @@ nextDayBtn.addEventListener("click", () => {
 
     gameState.currentDayIndex = (gameState.currentDayIndex + 1) % gameState.days.length;
     
-    // Montag: Neue Woche / Reset
     if (gameState.currentDayIndex === 0) {
         gameState.bookedLocation = null;
         gameState.gigRequests.forEach(g => {
@@ -268,5 +264,5 @@ nextDayBtn.addEventListener("click", () => {
     updateUI();
 });
 
-// Initiales Rendering
+// Start
 updateUI();
