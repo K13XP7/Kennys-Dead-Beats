@@ -27,7 +27,7 @@
                         <li class="nav-item active" data-tab="overview">Übersicht</li>
                         <li class="nav-item" data-tab="messages">Nachrichten ✉</li>
                         <li class="nav-item" data-tab="locations">Locations</li>
-                        <li class="nav-item" data-tab="djs">DJs & Lineup</li>
+                        <li class="nav-item" data-tab="djs">DJs buchen 🎧</li>
                         <li class="nav-item" data-tab="finances">Finanzen</li>
                     </ul>
                 </nav>
@@ -42,11 +42,12 @@
                     <div class="cards-grid">
                         <div class="card">
                             <h3>Status</h3>
-                            <p id="status-text">Bereite das Wochenende vor. Nimm DJ-Anfragen an oder buche eine eigene Location.</p>
+                            <p id="status-text">Bereite das Wochenende vor. Nimm DJ-Anfragen an, buche eine Location und stelle dein Lineup zusammen.</p>
                         </div>
                         <div class="card">
-                            <h3>Gebuchte eigene Location</h3>
-                            <p id="booked-location-text">Aktuell keine eigene Location für diese Woche gebucht.</p>
+                            <h3>Eigene Party für dieses Wochenende</h3>
+                            <p id="booked-location-text">Aktuell keine Location gebucht.</p>
+                            <p id="booked-djs-text">Gebuchte DJs: Keine</p>
                         </div>
                     </div>
                 </section>
@@ -69,10 +70,13 @@
                     </div>
                 </section>
 
-                <!-- Tab 4: DJs -->
+                <!-- Tab 4: DJs buchen -->
                 <section id="tab-djs" class="tab-content">
-                    <h2>Lineup & Fremd-DJs</h2>
-                    <p class="section-desc">Demnächst verfügbar: DJs für dein eigenes Event buchen.</p>
+                    <h2>DJs buchen (Rhein-Main Szene)</h2>
+                    <p class="section-desc">Heuere bekannte DJs und Underground-Talente aus der Region für dein nächstes Event an:</p>
+                    <div id="djs-list" class="cards-grid">
+                        <!-- Dynamische DJ-Liste -->
+                    </div>
                 </section>
 
                 <!-- Tab 5: Finanzen -->
