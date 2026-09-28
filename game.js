@@ -4,6 +4,7 @@ const gameState = {
     currentDayIndex: 0,
     days: ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
     bookedLocation: null,
+    bookedDJs: [],
     gigRequests: [
         {
             id: "gig-1",
@@ -76,6 +77,59 @@ const gameState = {
             cost: 1950.00,
             description: "Altes Fabrikgelände im Gutleutviertel. Mehrere düstere Floors für große Schwarze Nächte."
         }
+    ],
+    // Szene-DJs aus dem Rhein-Main-Gebiet
+    djs: [
+        {
+            id: "dj-shadowkin",
+            name: "DJ Shadowkin",
+            status: "Underground-Tipp",
+            genres: "Coldwave, Minimal Synth",
+            location: "Mainz / Wiesbaden",
+            fee: 80.00,
+            popularity: "+10% Gäste",
+            description: "Aufstrebender DJ aus den Gewölben des Caveau Mainz. Zieht echtes Underground-Publikum an."
+        },
+        {
+            id: "dj-vampira",
+            name: "DJane Vampira",
+            status: "Lokalmatadorin",
+            genres: "Post-Punk, Batcave, Deathrock",
+            location: "Frankfurt am Main",
+            fee: 140.00,
+            popularity: "+20% Gäste",
+            description: "Bekannt aus dem Ponyhof FFM. Liefert energiegeladenen 80s-Goth & Underground-Klassiker."
+        },
+        {
+            id: "dj-cyberpulse",
+            name: "DJ CyberPulse",
+            status: "Industrial-Spezialist",
+            genres: "EBM, Harsh Electro, Aggrotech",
+            location: "Offenbach am Main",
+            fee: 220.00,
+            popularity: "+30% Gäste",
+            description: "Bekannt für tanzbare Bässe und harten EBM. Garant für volle Floors bei Industrial-Liebhabern."
+        },
+        {
+            id: "dj-nox",
+            name: "DJ Nox & Fräulein Schatten",
+            status: "Szenegröße",
+            genres: "Darkwave, Gothic Rock, Neofolk",
+            location: "Darmstadt / FFM",
+            fee: 350.00,
+            popularity: "+45% Gäste",
+            description: "Erfahrenes DJ-Duo, das seit Jahren im Nachtleben FFM auflegt. Zieht treue Stammgäste an."
+        },
+        {
+            id: "dj-ironbeast",
+            name: "DJ Ironbeast",
+            status: "Headliner",
+            genres: "Industrial, Rhythmic Noise, Synthpop",
+            location: "Wiesbaden (Schlachthof)",
+            fee: 550.00,
+            popularity: "+65% Gäste",
+            description: "Regionaler Veteran, der regelmäßig das Kesselhaus füllt. Bringt eine riesige Fanbase mit."
+        }
     ]
 };
 
@@ -85,10 +139,12 @@ const dayDisplay = document.getElementById("day-display");
 const nextDayBtn = document.getElementById("next-day-btn");
 const statusText = document.getElementById("status-text");
 const bookedLocationText = document.getElementById("booked-location-text");
+const bookedDJsText = document.getElementById("booked-djs-text");
 const locationsListContainer = document.getElementById("locations-list");
 const gigRequestsListContainer = document.getElementById("gig-requests-list");
+const djsListContainer = document.getElementById("djs-list");
 
-// Linke Navigation / Tabs Umschalten
+// Navigation / Tabs Umschalten
 const navItems = document.querySelectorAll(".nav-item");
 const tabContents = document.querySelectorAll(".tab-content");
 
@@ -104,7 +160,7 @@ navItems.forEach(item => {
     });
 });
 
-// DJ-Anfragen im Karten-Design rendern
+// DJ-Anfragen (Nachrichten) rendern
 function renderGigRequests() {
     gigRequestsListContainer.innerHTML = "";
 
@@ -139,7 +195,6 @@ function renderGigRequests() {
         gigRequestsListContainer.appendChild(card);
     });
 
-    // Button Listener
     document.querySelectorAll(".accept-gig-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
             const gigId = e.target.getAttribute("data-id");
@@ -216,16 +271,72 @@ function bookLocation(locId) {
     }
 }
 
+// DJs buchen rendern
+function renderDJs() {
+    djsListContainer.innerHTML = "";
+
+    gameState.djs.forEach(dj => {
+        const isBooked = gameState.bookedDJs.some(b => b.id === dj.id);
+        const canAfford = gameState.money >= dj.fee;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+            <div>
+                <h3>${dj.name} <small style="font-size:0.8rem; color:#888;">(${dj.status})</small></h3>
+                <p>${dj.description}</p>
+                <p><strong>Herkunft/Szene:</strong> ${dj.location}</p>
+                <p><strong>Genres:</strong> ${dj.genres}</p>
+                <p><strong>Anziehungskraft:</strong> <span style="color:#00e676;">${dj.popularity}</span></p>
+                <p><strong>Gage/Honorar:</strong> ${dj.fee.toFixed(2)} €</p>
+            </div>
+            <div class="card-action">
+                <button class="btn-primary book-dj-btn" 
+                    data-id="${dj.id}" 
+                    ${isBooked || !canAfford ? "disabled" : ""}>
+                    ${isBooked ? "Gebucht ✓" : "Für Party buchen"}
+                </button>
+            </div>
+        `;
+        djsListContainer.appendChild(card);
+    });
+
+    document.querySelectorAll(".book-dj-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const djId = e.target.getAttribute("data-id");
+            bookDJ(djId);
+        });
+    });
+}
+
+function bookDJ(djId) {
+    const dj = gameState.djs.find(d => d.id === djId);
+    if (dj && gameState.money >= dj.fee) {
+        gameState.money -= dj.fee;
+        gameState.bookedDJs.push(dj);
+        updateUI();
+    }
+}
+
 // UI Aktualisieren
 function updateUI() {
     moneyDisplay.innerText = `${gameState.money.toFixed(2)} €`;
     const dayName = gameState.days[gameState.currentDayIndex];
     dayDisplay.innerText = dayName;
 
+    // Location-Anzeige auf Dashboard
     if (gameState.bookedLocation) {
         bookedLocationText.innerHTML = `<strong>${gameState.bookedLocation.name}</strong> (Max. ${gameState.bookedLocation.capacity} Gäste)`;
     } else {
-        bookedLocationText.innerText = "Aktuell keine eigene Location für diese Woche gebucht.";
+        bookedLocationText.innerText = "Aktuell keine Location gebucht.";
+    }
+
+    // DJs-Anzeige auf Dashboard
+    if (gameState.bookedDJs.length > 0) {
+        const djNames = gameState.bookedDJs.map(d => d.name).join(", ");
+        bookedDJsText.innerHTML = `<strong>Gebuchte DJs:</strong> ${djNames}`;
+    } else {
+        bookedDJsText.innerText = "Gebuchte DJs: Keine";
     }
 
     if (gameState.currentDayIndex === 4 || gameState.currentDayIndex === 5) {
@@ -233,11 +344,12 @@ function updateUI() {
         statusText.innerText = "Das Wochenende bricht an! Die Schattenwelten erwachen.";
     } else {
         nextDayBtn.innerText = "WEITER ➔";
-        statusText.innerText = "Bereite das Wochenende vor. Nimm DJ-Anfragen an oder buche eine eigene Location.";
+        statusText.innerText = "Bereite das Wochenende vor. Nimm DJ-Anfragen an, buche eine Location und stelle dein Lineup zusammen.";
     }
 
     renderGigRequests();
     renderLocations();
+    renderDJs();
 }
 
 // Weiter-Button (Tage weiterschalten & Geld auszahlen)
@@ -253,8 +365,10 @@ nextDayBtn.addEventListener("click", () => {
 
     gameState.currentDayIndex = (gameState.currentDayIndex + 1) % gameState.days.length;
     
+    // Montag Reset
     if (gameState.currentDayIndex === 0) {
         gameState.bookedLocation = null;
+        gameState.bookedDJs = [];
         gameState.gigRequests.forEach(g => {
             g.accepted = false;
             g.declined = false;
