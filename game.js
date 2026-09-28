@@ -4,6 +4,35 @@ const gameState = {
     currentDayIndex: 0,
     days: ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
     bookedLocation: null,
+    gigRequests: [
+        {
+            id: "gig-1",
+            title: "Darkwave Night @ Caveau Mainz",
+            genre: "Darkwave & Postpunk",
+            day: "Freitag",
+            fee: 180.00,
+            accepted: false,
+            declined: false
+        },
+        {
+            id: "gig-2",
+            title: "Industrial Noise Mass @ Stengelvilla",
+            genre: "Harsh EBM / Industrial",
+            day: "Samstag",
+            fee: 250.00,
+            accepted: false,
+            declined: false
+        },
+        {
+            id: "gig-3",
+            title: "Gothic Classics @ Final Darkness",
+            genre: "80s Goth & Batcave",
+            day: "Samstag",
+            fee: 210.00,
+            accepted: false,
+            declined: false
+        }
+    ],
     locations: [
         {
             id: "ponyhof",
@@ -47,36 +76,6 @@ const gameState = {
             cost: 1950.00,
             description: "Altes Fabrikgelände im Gutleutviertel. Mehrere düstere Floors für große Schwarze Nächte."
         }
-    ],
-    // Verfügbare Anfragen von fremden Veranstaltern
-    gigRequests: [
-        {
-            id: "gig-1",
-            title: "Darkwave Night @ Caveau Mainz",
-            genre: "Darkwave & Postpunk",
-            day: "Freitag",
-            fee: 180.00,
-            accepted: false,
-            declined: false
-        },
-        {
-            id: "gig-2",
-            title: "Industrial Noise Mass @ Stengelvilla Offenbach",
-            genre: "Harsh EBM / Industrial",
-            day: "Samstag",
-            fee: 250.00,
-            accepted: false,
-            declined: false
-        },
-        {
-            id: "gig-3",
-            title: "Gothic Classics @ Final Darkness",
-            genre: "80s Goth & Batcave",
-            day: "Samstag",
-            fee: 210.00,
-            accepted: false,
-            declined: false
-        }
     ]
 };
 
@@ -111,31 +110,31 @@ function renderGigRequests() {
 
     gameState.gigRequests.forEach(gig => {
         const card = document.createElement("div");
-        card.className = "card gig-card";
+        card.className = "card";
 
+        let actionHTML = "";
         if (gig.accepted) {
-            card.innerHTML = `
-                <h4>${gig.title}</h4>
-                <p><strong>Tag:</strong> ${gig.day}</p>
-                <p><span class="badge-success">Zugesagt ✓ (+${gig.fee.toFixed(2)} € am ${gig.day})</span></p>
-            `;
+            actionHTML = `<span class="badge-success">Zugesagt ✓ (+${gig.fee.toFixed(2)} € am ${gig.day})</span>`;
         } else if (gig.declined) {
-            card.innerHTML = `
-                <h4>${gig.title}</h4>
-                <p><span class="badge-muted">Abgelehnt ✗</span></p>
-            `;
+            actionHTML = `<span class="badge-muted">Abgelehnt ✗</span>`;
         } else {
-            card.innerHTML = `
-                <h4>${gig.title}</h4>
-                <p><strong>Genre:</strong> ${gig.genre}</p>
-                <p><strong>Wochentag:</strong> ${gig.day}</p>
-                <p><strong>Gage:</strong> <span class="fee-text">${gig.fee.toFixed(2)} €</span></p>
-                <div class="gig-actions">
-                    <button class="btn-primary accept-gig-btn" data-id="${gig.id}">Annehmen</button>
-                    <button class="btn-secondary decline-gig-btn" data-id="${gig.id}">Ablehnen</button>
-                </div>
+            actionHTML = `
+                <button class="btn-primary accept-gig-btn" data-id="${gig.id}">Annehmen</button>
+                <button class="btn-secondary decline-gig-btn" data-id="${gig.id}">Ablehnen</button>
             `;
         }
+
+        card.innerHTML = `
+            <div>
+                <h3>${gig.title}</h3>
+                <p><strong>Genre:</strong> ${gig.genre}</p>
+                <p><strong>Wochentag:</strong> ${gig.day}</p>
+                <p><strong>Honorar:</strong> ${gig.fee.toFixed(2)} €</p>
+            </div>
+            <div class="card-action">
+                ${actionHTML}
+            </div>
+        `;
 
         gigRequestsListContainer.appendChild(card);
     });
@@ -236,14 +235,14 @@ function updateUI() {
         statusText.innerText = "Das Wochenende bricht an! Die Schattenwelten erwachen.";
     } else {
         nextDayBtn.innerText = "WEITER ➔";
-        statusText.innerText = "Bereite das Wochenende vor. Nimm DJ-Gigs an oder buche eine eigene Location.";
+        statusText.innerText = "Bereite das Wochenende vor. Nimm DJ-Anfragen an oder buche eine eigene Location.";
     }
 
     renderGigRequests();
     renderLocations();
 }
 
-// Weiter-Button Logik mit Auszahlung der zugesagten Gigs
+// Weiter-Button Logik
 nextDayBtn.addEventListener("click", () => {
     const currentDay = gameState.days[gameState.currentDayIndex];
 
@@ -260,7 +259,6 @@ nextDayBtn.addEventListener("click", () => {
     // Montag: Neue Woche / Reset
     if (gameState.currentDayIndex === 0) {
         gameState.bookedLocation = null;
-        // Gigs zurücksetzen
         gameState.gigRequests.forEach(g => {
             g.accepted = false;
             g.declined = false;
