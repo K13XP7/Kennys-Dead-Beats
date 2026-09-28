@@ -23,24 +23,56 @@
             <aside class="sidebar">
                 <nav>
                     <ul>
-                        <li class="active">Übersicht</li>
-                        <li>DJs & Roster</li>
-                        <li>Club-Events</li>
-                        <li>Finanzen</li>
+                        <li class="nav-item active" data-tab="overview">Übersicht</li>
+                        <li class="nav-item" data-tab="locations">Locations</li>
+                        <li class="nav-item" data-tab="djs">DJs & Roster</li>
+                        <li class="nav-item" data-tab="events">Club-Events</li>
+                        <li class="nav-item" data-tab="finances">Finanzen</li>
                     </ul>
                 </nav>
             </aside>
+            
             <section class="main-panel">
-                <h2>Dashboard Overview</h2>
-                <div class="cards-grid">
-                    <div class="card">
-                        <h3>Aktueller Status</h3>
-                        <p id="status-text">Bereite das Wochenende vor. Buche DJs und wähle die Setlists.</p>
+                <!-- Tab 1: Übersicht -->
+                <div id="tab-overview" class="tab-content active">
+                    <h2>Dashboard Overview</h2>
+                    <div class="cards-grid">
+                        <div class="card">
+                            <h3>Aktueller Status</h3>
+                            <p id="status-text">Bereite das Wochenende vor. Buche eine Location und passende DJs.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Gebuchte Location</h3>
+                            <p id="booked-location-text">Aktuell keine Location für diese Woche gebucht.</p>
+                        </div>
                     </div>
-                    <div class="card">
-                        <h3>Wochen-News</h3>
-                        <p>Keine neuen Mitteilungen.</p>
+                </div>
+
+                <!-- Tab 2: Locations -->
+                <div id="tab-locations" class="tab-content">
+                    <h2>Verfügbare Locations</h2>
+                    <p class="section-desc">Wähle eine passende Location für deine nächste Party aus:</p>
+                    <div id="locations-list" class="cards-grid">
+                        <!-- Wird dynamisch per JS befüllt -->
                     </div>
+                </div>
+
+                <!-- Tab 3: DJs (Platzhalter) -->
+                <div id="tab-djs" class="tab-content">
+                    <h2>DJs & Roster</h2>
+                    <p>Hier kannst du bald DJs verwalten und unter Vertrag nehmen.</p>
+                </div>
+
+                <!-- Tab 4: Events (Platzhalter) -->
+                <div id="tab-events" class="tab-content">
+                    <h2>Club-Events</h2>
+                    <p>Planung deiner kommenden Events.</p>
+                </div>
+
+                <!-- Tab 5: Finanzen (Platzhalter) -->
+                <div id="tab-finances" class="tab-content">
+                    <h2>Finanzen</h2>
+                    <p>Detaillierte Einnahmen und Ausgaben.</p>
                 </div>
             </section>
         </main>
