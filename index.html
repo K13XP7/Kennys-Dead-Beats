@@ -3,89 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kenny's Dead Beats - Management Simulation</title>
-    <link rel="stylesheet" href="style.css?v=5">
+    <title>Goth & Industrial Manager</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
-        <!-- Header / Statusleiste -->
+        <!-- Header / Statusleiste oben -->
         <header class="top-header">
             <div class="logo">KENNY'S DEAD BEATS</div>
             <div class="stats">
-                <span class="stat-item">Geld: <strong id="money-display">1450,00 €</strong></span>
                 <span class="stat-item">Tag: <strong id="day-display">Montag</strong></span>
+                <span class="stat-item">Budget: <strong id="money-display" class="money">1450.00 €</strong></span>
             </div>
             <button id="next-day-btn" class="btn-primary">WEITER ➔</button>
         </header>
 
-        <!-- Hauptbereich / Dashboard -->
-        <main class="dashboard-content">
+        <!-- Hauptbereich: Links Menü, Rechts der Inhalt -->
+        <div class="main-layout">
+            <!-- Linke Navigation / Menü -->
             <aside class="sidebar">
                 <nav>
                     <ul>
                         <li class="nav-item active" data-tab="overview">Übersicht</li>
                         <li class="nav-item" data-tab="messages">Nachrichten ✉</li>
                         <li class="nav-item" data-tab="locations">Locations</li>
-                        <li class="nav-item" data-tab="djs">DJs & Roster</li>
-                        <li class="nav-item" data-tab="events">Club-Events</li>
+                        <li class="nav-item" data-tab="djs">DJs & Lineup</li>
                         <li class="nav-item" data-tab="finances">Finanzen</li>
                     </ul>
                 </nav>
             </aside>
-            
-            <section class="main-panel">
+
+            <!-- Rechter Inhaltsbereich (Tabs) -->
+            <main class="content-area">
+                
                 <!-- Tab 1: Übersicht -->
-                <div id="tab-overview" class="tab-content active">
-                    <h2>Dashboard Overview</h2>
+                <section id="tab-overview" class="tab-content active">
+                    <h2>Wochen-Status</h2>
                     <div class="cards-grid">
                         <div class="card">
-                            <h3>Aktueller Status</h3>
+                            <h3>Status</h3>
                             <p id="status-text">Bereite das Wochenende vor. Nimm DJ-Anfragen an oder buche eine eigene Location.</p>
                         </div>
                         <div class="card">
-                            <h3>Gebuchte Location</h3>
-                            <p id="booked-location-text">Aktuell keine Location für diese Woche gebucht.</p>
+                            <h3>Gebuchte eigene Location</h3>
+                            <p id="booked-location-text">Aktuell keine eigene Location für diese Woche gebucht.</p>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                <!-- Tab 2: Nachrichten (DJ-Gigs) -->
-                <div id="tab-messages" class="tab-content">
+                <!-- Tab 2: Nachrichten (DJ-Anfragen) -->
+                <section id="tab-messages" class="tab-content">
                     <h2>Nachrichten & DJ-Anfragen 🦇</h2>
-                    <p class="section-desc">Veranstaltungen anderer Clubs, auf denen du auflegen und Honorar verdienen kannst:</p>
+                    <p class="section-desc">Veranstaltungen anderer Clubs, auf denen du als DJ auflegen und Honorar verdienen kannst:</p>
                     <div id="gig-requests-list" class="cards-grid">
-                        <!-- Wird dynamisch per JS befüllt -->
+                        <!-- Dynamische DJ-Anfragen -->
                     </div>
-                </div>
+                </section>
 
                 <!-- Tab 3: Locations -->
-                <div id="tab-locations" class="tab-content">
-                    <h2>Verfügbare Locations</h2>
-                    <p class="section-desc">Wähle eine passende Location für deine nächste Party aus:</p>
+                <section id="tab-locations" class="tab-content">
+                    <h2>Rhein-Main Szene-Locations</h2>
+                    <p class="section-desc">Buche eine Location für deine eigene Party am Wochenende:</p>
                     <div id="locations-list" class="cards-grid">
-                        <!-- Wird dynamisch per JS befüllt -->
+                        <!-- Dynamische Locations -->
                     </div>
-                </div>
+                </section>
 
                 <!-- Tab 4: DJs -->
-                <div id="tab-djs" class="tab-content">
-                    <h2>DJs & Roster</h2>
-                    <p class="section-desc">Hier kannst du bald DJs verwalten und unter Vertrag nehmen.</p>
-                </div>
+                <section id="tab-djs" class="tab-content">
+                    <h2>Lineup & Fremd-DJs</h2>
+                    <p class="section-desc">Demnächst verfügbar: DJs für dein eigenes Event buchen.</p>
+                </section>
 
-                <!-- Tab 5: Events -->
-                <div id="tab-events" class="tab-content">
-                    <h2>Club-Events</h2>
-                    <p class="section-desc">Planung deiner kommenden Events.</p>
-                </div>
+                <!-- Tab 5: Finanzen -->
+                <section id="tab-finances" class="tab-content">
+                    <h2>Finanzübersicht</h2>
+                    <p class="section-desc">Demnächst verfügbar: Einnahmen- und Ausgabenhistorie.</p>
+                </section>
 
-                <!-- Tab 6: Finanzen -->
-                <div id="tab-finances" class="tab-content">
-                    <h2>Finanzen</h2>
-                    <p class="section-desc">Detaillierte Einnahmen und Ausgaben.</p>
-                </div>
-            </section>
-        </main>
+            </main>
+        </div>
     </div>
 
     <script src="game.js"></script>
