@@ -94,13 +94,13 @@ body {
     overflow-y: auto;
 }
 
-/* --- TAB SWITCHING FIX --- */
+/* Tab Switching Logic */
 .tab-content {
-    display: none !important;
+    display: none;
 }
 
 .tab-content.active {
-    display: block !important;
+    display: block;
 }
 
 .section-desc {
