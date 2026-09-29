@@ -1,54 +1,234 @@
-/* Finanz-Übersicht Styles */
-.stat-number {
-    font-size: 1.6rem;
-    font-weight: bold;
-    margin-top: 10px;
+/* style.css */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.income-text {
-    color: #4caf50;
-}
-
-.expense-text {
-    color: #f44336;
-}
-
-.table-container {
-    background-color: #1a1a1e;
-    border: 1px solid #29292e;
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.finance-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-}
-
-.finance-table th {
-    background-color: #242428;
-    color: #a8a8b3;
-    padding: 12px 16px;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid #29292e;
-}
-
-.finance-table td {
-    padding: 12px 16px;
+body {
+    background-color: #121214;
     color: #e1e1e6;
-    font-size: 0.9rem;
-    border-bottom: 1px solid #222226;
+    display: flex;
+    min-height: 100vh;
 }
 
-.finance-table tr:hover {
+.app-container {
+    display: flex;
+    width: 100%;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 260px;
+    background-color: #1a1a1e;
+    border-right: 1px solid #29292e;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 1.4rem;
+    color: #00e676;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: #a8a8b3;
+    padding: 12px 15px;
+    text-align: left;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-btn:hover, .nav-btn.active {
+    background-color: #29292e;
+    color: #ffffff;
+}
+
+.time-controls {
     background-color: #202024;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
 }
 
-.empty-history {
-    text-align: center;
-    color: #666;
-    padding: 20px !important;
+.date-display {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #00e676;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+/* Cards & Layout */
+.stats-grid, .finance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.stat-card, .info-card {
+    background-color: #202024;
+    border: 1px solid #29292e;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00e676;
+    margin-top: 8px;
+}
+
+.highlight-card {
+    border-left: 4px solid #00e676;
+    margin-bottom: 25px;
+}
+
+/* Job Grid */
+.job-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.job-card {
+    background-color: #202024;
+    border: 1px solid #29292e;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.job-card h4 {
+    color: #00e676;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.job-meta {
+    font-size: 0.9rem;
+    color: #a8a8b3;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+/* Buttons */
+.primary-btn, .secondary-btn {
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.primary-btn {
+    background-color: #00e676;
+    color: #000;
+    width: 100%;
+}
+
+.primary-btn:hover {
+    background-color: #00c853;
+}
+
+.secondary-btn {
+    background-color: #29292e;
+    color: #fff;
+}
+
+.secondary-btn:hover {
+    background-color: #323238;
+}
+
+/* Modals */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #1a1a1e;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Logs */
+.log-list {
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.log-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #29292e;
+    font-size: 0.95rem;
+}
+
+.bank-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.bank-actions input {
+    background-color: #121214;
+    border: 1px solid #29292e;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    width: 120px;
 }
