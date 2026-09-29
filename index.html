@@ -1,126 +1,120 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goth & Industrial Manager</title>
+    <title>Rhein-Main DJ & Event Manager</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app">
-        <!-- Header / Statusleiste oben -->
-        <header class="top-header">
-            <div class="logo">KENNY'S DEAD BEATS</div>
-            <div class="stats">
-                <span class="stat-item">Tag: <strong id="day-display">Montag</strong></span>
-                <span class="stat-item">Budget: <strong id="money-display" class="money">1450.00 €</strong></span>
-            </div>
-            <button id="next-day-btn" class="btn-primary">WEITER ➔</button>
-        </header>
 
-        <!-- Hauptbereich: Links Menü, Rechts der Inhalt -->
-        <div class="main-layout">
-            <!-- Linke Navigation / Menü -->
-            <aside class="sidebar">
-                <nav>
-                    <ul>
-                        <li class="nav-item active" data-tab="overview">Übersicht</li>
-                        <li class="nav-item" data-tab="messages">Nachrichten ✉</li>
-                        <li class="nav-item" data-tab="locations">Locations</li>
-                        <li class="nav-item" data-tab="djs">DJs buchen 🎧</li>
-                        <li class="nav-item" data-tab="finances">Finanzen 📊</li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <!-- Rechter Inhaltsbereich (Tabs) -->
-            <main class="content-area">
-                
-                <!-- Tab 1: Übersicht -->
-                <section id="tab-overview" class="tab-content active">
-                    <h2>Wochen-Status</h2>
-                    <div class="cards-grid">
-                        <div class="card">
-                            <h3>Status</h3>
-                            <p id="status-text">Bereite das Wochenende vor. Nimm DJ-Anfragen an, buche eine Location und stelle dein Lineup zusammen.</p>
-                        </div>
-                        <div class="card">
-                            <h3>Eigene Party für dieses Wochenende</h3>
-                            <p id="booked-location-text">Aktuell keine Location gebucht.</p>
-                            <p id="booked-djs-text">Gebuchte DJs: Keine</p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Tab 2: Nachrichten (DJ-Anfragen) -->
-                <section id="tab-messages" class="tab-content">
-                    <h2>Nachrichten & DJ-Anfragen 🦇</h2>
-                    <p class="section-desc">Veranstaltungen anderer Clubs, auf denen du als DJ auflegen und Honorar verdienen kannst:</p>
-                    <div id="gig-requests-list" class="cards-grid">
-                        <!-- Dynamische DJ-Anfragen -->
-                    </div>
-                </section>
-
-                <!-- Tab 3: Locations -->
-                <section id="tab-locations" class="tab-content">
-                    <h2>Rhein-Main Szene-Locations</h2>
-                    <p class="section-desc">Buche eine Location für deine eigene Party am Wochenende:</p>
-                    <div id="locations-list" class="cards-grid">
-                        <!-- Dynamische Locations -->
-                    </div>
-                </section>
-
-                <!-- Tab 4: DJs buchen -->
-                <section id="tab-djs" class="tab-content">
-                    <h2>DJs buchen (Rhein-Main Szene)</h2>
-                    <p class="section-desc">Heuere bekannte DJs und Underground-Talente aus der Region für dein nächstes Event an:</p>
-                    <div id="djs-list" class="cards-grid">
-                        <!-- Dynamische DJ-Liste -->
-                    </div>
-                </section>
-
-                <!-- Tab 5: Finanzen -->
-                <section id="tab-finances" class="tab-content">
-                    <h2>Finanzübersicht & Kontoauszug 📊</h2>
-                    <p class="section-desc">Detaillierte Übersicht über all deine Einnahmen und Ausgaben:</p>
-                    
-                    <!-- Finanz-Kennzahlen -->
-                    <div class="cards-grid">
-                        <div class="card">
-                            <h3>Gesamteinnahmen</h3>
-                            <p class="stat-number income-text" id="total-income-display">+0.00 €</p>
-                        </div>
-                        <div class="card">
-                            <h3>Gesamtausgaben</h3>
-                            <p class="stat-number expense-text" id="total-expense-display">-0.00 €</p>
-                        </div>
-                        <div class="card">
-                            <h3>Netto-Bilanz</h3>
-                            <p class="stat-number" id="net-balance-display">0.00 €</p>
-                        </div>
-                    </div>
-
-                    <!-- Transaktions-Tabelle -->
-                    <h3 style="margin-top: 30px; margin-bottom: 10px;">Transaktionshistorie</h3>
-                    <div class="table-container">
-                        <table class="finance-table">
-                            <thead>
-                                <tr>
-                                    <th>Tag</th>
-                                    <th>Beschreibung</th>
-                                    <th>Kategorie</th>
-                                    <th>Betrag</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transaction-history">
-                                <!-- Dynamische Buchungen -->
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-            </main>
+    <!-- Onboarding Modal: Jobauswahl beim Spielstart -->
+    <div id="onboarding-modal" class="modal">
+        <div class="modal-content onboarding-card">
+            <h2>Willkommen in der Rhein-Main Szene! 🎧</h2>
+            <p>Bevor du dein erstes Event planst, wähle bitte deinen Einstiegsjob im Handel oder Gewerbe aus:</p>
+            <div id="onboarding-job-list" class="job-grid"></div>
         </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <h1 class="logo">Rhein-Main DJ</h1>
+            <nav class="nav-menu">
+                <button class="nav-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+                <button class="nav-btn" onclick="switchTab('jobboerse')">💼 Jobbörse</button>
+                <button class="nav-btn" onclick="switchTab('finanzen')">🏦 Bank & Finanzen</button>
+                <button class="nav-btn" onclick="switchTab('events')">🎉 Event-Planung</button>
+            </nav>
+            <div class="time-controls">
+                <div class="date-display" id="date-display">Mo, 01.01.2026</div>
+                <button class="primary-btn" id="next-day-btn" onclick="advanceDay()">Nächster Tag ⏩</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Dashboard Tab -->
+            <section id="dashboard" class="tab-content active">
+                <h2>Übersicht</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Girokonto</h3>
+                        <p class="stat-value" id="giro-val">0,00 €</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Sparkonto</h3>
+                        <p class="stat-value" id="spar-val">0,00 €</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Aktueller Job</h3>
+                        <p class="stat-value" id="job-val">Kein Job</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Energie</h3>
+                        <p class="stat-value" id="energy-val">100 / 100</p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>Status & Nachrichten</h3>
+                    <ul id="log-list" class="log-list"></ul>
+                </div>
+            </section>
+
+            <!-- Jobbörse Tab -->
+            <section id="jobboerse" class="tab-content">
+                <h2>Jobbörse & Karriere 💼</h2>
+                
+                <div class="info-card highlight-card">
+                    <h3>Dein Aktueller Arbeitsvertrag</h3>
+                    <div id="current-job-details">
+                        <p>Lade Vertragsdaten...</p>
+                    </div>
+                </div>
+
+                <h3>Verfügbare Stellenangebote</h3>
+                <div id="job-board-list" class="job-grid"></div>
+            </section>
+
+            <!-- Finanzen Tab -->
+            <section id="finanzen" class="tab-content">
+                <h2>Bank & Finanzen 🏦</h2>
+                
+                <div class="finance-grid">
+                    <div class="info-card">
+                        <h3>Girokonto & Fixkosten</h3>
+                        <p><strong>Guthaben:</strong> <span id="fin-giro">0,00 €</span></p>
+                        <p><strong>Monatliche Fixkosten (Miete + Strom):</strong> <span id="fin-fixkosten">750,00 €</span></p>
+                        <p class="small-text">* Werden automatisch am 1. des Monats abgebucht.</p>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Sparkonto (Zins: 3.0 % p.a.)</h3>
+                        <p><strong>Guthaben:</strong> <span id="fin-spar">0,00 €</span></p>
+                        <div class="bank-actions">
+                            <input type="number" id="bank-amount" placeholder="Betrag in €" min="1">
+                            <button class="secondary-btn" onclick="depositSavings()">Einzahlen 📥</button>
+                            <button class="secondary-btn" onclick="withdrawSavings()">Auszahlen 📤</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events Tab -->
+            <section id="events" class="tab-content">
+                <h2>Event-Planung 🎉</h2>
+                <div class="info-card">
+                    <h3>Rhein-Main Szene Events</h3>
+                    <p>Plane hier Partys oder buche DJ-Gigs am Wochenende.</p>
+                    <p><em>(In Kürze verfügbar)</em></p>
+                </div>
+            </section>
+
+        </main>
     </div>
 
     <script src="game.js"></script>
