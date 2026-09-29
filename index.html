@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -14,6 +15,33 @@
             <h2>Willkommen in der Rhein-Main Szene! 🎧</h2>
             <p>Bevor du dein erstes Event planst, wähle bitte deinen Einstiegsjob im Handel oder Gewerbe aus:</p>
             <div id="onboarding-job-list" class="job-grid"></div>
+        </div>
+    </div>
+
+    <!-- Event-Result Modal (Animierte Auswertung am Morgen nach der Party) -->
+    <div id="event-result-modal" class="modal" style="display: none;">
+        <div class="modal-content result-card">
+            <h2 id="res-event-title">🎉 Party-Auswertung</h2>
+            <p id="res-event-date" class="small-text">Datum des Events</p>
+            <hr class="divider">
+
+            <div class="result-step" id="step-visitors">
+                <h3>🎟️ Besucherzahlen</h3>
+                <p id="res-visitors-text">Berechne Gäste...</p>
+            </div>
+
+            <div class="result-step" id="step-finances" style="margin-top: 15px;">
+                <h3>💰 Finanz-Abrechnung</h3>
+                <p id="res-income-text">Ticket-Einnahmen: 0.00 €</p>
+                <p id="res-costs-text">Vorausbezahlte Kosten (Miete + Werbung): 0.00 €</p>
+            </div>
+
+            <div class="result-step" id="step-total" style="margin-top: 20px;">
+                <h3>📊 Endergebnis</h3>
+                <p id="res-total-text" class="stat-value">+0.00 €</p>
+            </div>
+
+            <button class="primary-btn" style="margin-top: 25px;" onclick="closeEventResultModal()">Weiter ins Dashboard ⏩</button>
         </div>
     </div>
 
@@ -66,6 +94,14 @@
                     </div>
                 </div>
 
+                <!-- DJ Mailbox / Requests -->
+                <div class="info-card highlight-card" style="margin-bottom: 25px;">
+                    <h3>✉️ Postfach: DJ-Anfragen (Fremd-Gigs)</h3>
+                    <div id="dj-mailbox-list">
+                        <p class="small-text">Keine neuen Anfragen vorhanden.</p>
+                    </div>
+                </div>
+
                 <div class="info-card">
                     <h3>Status & Nachrichten</h3>
                     <ul id="log-list" class="log-list"></ul>
@@ -75,14 +111,12 @@
             <!-- Jobbörse Tab -->
             <section id="jobboerse" class="tab-content">
                 <h2>Jobbörse & Karriere 💼</h2>
-                
                 <div class="info-card highlight-card">
                     <h3>Dein Aktueller Arbeitsvertrag</h3>
                     <div id="current-job-details">
                         <p>Lade Vertragsdaten...</p>
                     </div>
                 </div>
-
                 <h3>Verfügbare Stellenangebote</h3>
                 <div id="job-board-list" class="job-grid"></div>
             </section>
@@ -90,7 +124,6 @@
             <!-- Finanzen Tab -->
             <section id="finanzen" class="tab-content">
                 <h2>Bank & Finanzen 🏦</h2>
-                
                 <div class="finance-grid">
                     <div class="info-card">
                         <h3>Girokonto & Fixkosten</h3>
@@ -114,11 +147,15 @@
             <!-- Events Tab -->
             <section id="events" class="tab-content">
                 <h2>Event-Planung 🎉</h2>
-                <div class="info-card">
-                    <h3>Rhein-Main Szene Events</h3>
-                    <p>Plane hier Partys oder buche DJ-Gigs am Wochenende.</p>
-                    <p><em>(In Kürze verfügbar)</em></p>
+                
+                <!-- Active Event Card if booked -->
+                <div id="active-event-status" class="info-card highlight-card" style="margin-bottom: 25px;">
+                    <h3>Geplante eigene Veranstaltung</h3>
+                    <p id="active-event-details">Aktuell ist keine eigene Party geplant.</p>
                 </div>
+
+                <h3>Location Buchen & Party Organisieren</h3>
+                <div id="location-list" class="job-grid"></div>
             </section>
 
         </main>
