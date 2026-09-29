@@ -1,5 +1,3 @@
-// game.js
-
 // 1. DATA DEFINITIONS
 const AVAILABLE_JOBS = [
     {
@@ -66,7 +64,7 @@ const LOCATIONS = [
         city: "Mainz",
         rent: 250.00,
         capacity: 120,
-        description: "Athmosphärischer Gewölbekeller. Ideal für Postpunk, Darkwave und intimere Clubnächte."
+        description: "Atmosphärischer Gewölbekeller. Ideal für Postpunk, Darkwave und intimere Clubnächte."
     },
     {
         id: "stengelvilla_wiesbaden",
@@ -92,6 +90,17 @@ const MARKETING_PACKAGES = [
     { id: "online", name: "Social Media & Online-Promo (120 €)", cost: 120, boost: 1.50 },
     { id: "full", name: "Full Szene-Blast (Print, Online, Flyer) (250 €)", cost: 250, boost: 1.85 }
 ];
+
+// Wochentags-Multiplikatoren für Besucherzahlen
+const WEEKDAY_DEMAND_MULTIPLIERS = {
+    0: 0.65, // Sonntag
+    1: 0.35, // Montag
+    2: 0.40, // Dienstag
+    3: 0.45, // Mittwoch
+    4: 0.55, // Donnerstag
+    5: 1.10, // Freitag
+    6: 1.25  // Samstag
+};
 
 // 2. GAME STATE
 let gameState = {
@@ -300,11 +309,12 @@ function renderLocations() {
     if (statusContainer) {
         if (gameState.plannedEvent) {
             const ev = gameState.plannedEvent;
+            const weekdayName = WEEKDAYS[ev.eventDate.getDay()];
             statusContainer.innerHTML = `
                 <p><strong>Location:</strong> ${ev.location.name}</p>
-                <p><strong>Termin:</strong> ${ev.dayText} (${formatDate(ev.eventDate)})</p>
+                <p><strong>Termin:</strong> ${weekdayName}, ${formatDate(ev.eventDate)}</p>
                 <p><strong>Eintritt:</strong> ${ev.ticketPrice.toFixed(2)} € | <strong>Marketing:</strong> ${ev.marketing.name}</p>
-                <p><strong>Kosten im Voraus bezahlt:</strong> ${(ev.location.rent + ev.marketing.cost).toFixed(2)} €</p>
+                <p><strong>Kosten im Voraus bezahlt:</strong> ${ev.totalUpfrontCost.toFixed(2)} €</p>
             `;
         } else {
             statusContainer.innerHTML = `<p>Aktuell ist keine eigene Party geplant.</p>`;
@@ -312,6 +322,18 @@ function renderLocations() {
     }
 
     container.innerHTML = '';
+
+    // Generiere Datumsoptionen für die nächsten 14 Tage
+    const dateOptions = [];
+    for (let i = 1; i <= 14; i++) {
+        const d = new Date(gameState.currentDate);
+        d.setDate(d.getDate() + i);
+        const dayName = WEEKDAYS[d.getDay()];
+        const formatted = formatDate(d);
+        const isoString = d.toISOString().split('T')[0];
+        dateOptions.push({ iso: isoString, label: `${dayName}, ${formatted}`, dateObj: d });
+    }
+
     LOCATIONS.forEach(loc => {
         const isBooked = gameState.plannedEvent !== null;
         const card = document.createElement('div');
@@ -326,10 +348,9 @@ function renderLocations() {
                 <p style="font-size: 0.85rem; color: #a8a8b3; margin-bottom: 15px;">${loc.description}</p>
                 
                 <div class="booking-form">
-                    <label>Veranstaltungstag:</label>
-                    <select id="day-select-${loc.id}">
-                        <option value="5">Diesen Freitag</option>
-                        <option value="6">Diesen Samstag</option>
+                    <label>Veranstaltungsdatum (Mo-So):</label>
+                    <select id="date-select-${loc.id}">
+                        ${dateOptions.map(opt => `<option value="${opt.iso}">${opt.label}</option>`).join('')}
                     </select>
 
                     <label>Eintrittspreis (€):</label>
@@ -358,7 +379,8 @@ function bookLocation(locId) {
     const loc = LOCATIONS.find(l => l.id === locId);
     if (!loc) return;
 
-    const dayVal = parseInt(document.getElementById(`day-select-${locId}`).value);
+    const dateValIso = document.getElementById(`date-select-${locId}`).value;
+    const selectedDate = new Date(dateValIso + "T00:00:00");
     const ticketPrice = parseFloat(document.getElementById(`price-select-${locId}`).value) || 8.0;
     const marketingId = document.getElementById(`marketing-select-${locId}`).value;
     const marketing = MARKETING_PACKAGES.find(m => m.id === marketingId);
@@ -370,23 +392,18 @@ function bookLocation(locId) {
         return;
     }
 
-    // Calculate Event Date
-    const daysUntil = (dayVal - gameState.currentDate.getDay() + 7) % 7 || 7;
-    const eventDate = new Date(gameState.currentDate);
-    eventDate.setDate(eventDate.getDate() + daysUntil);
-
-    // Deduct Rent & Marketing Upfront
+    // Miete & Werbung sofort abbuchen
     gameState.giroKonto -= totalUpfrontCost;
     gameState.plannedEvent = {
         location: loc,
-        eventDate: eventDate,
-        dayText: dayVal === 5 ? "Freitag" : "Samstag",
+        eventDate: selectedDate,
         ticketPrice: ticketPrice,
         marketing: marketing,
         totalUpfrontCost: totalUpfrontCost
     };
 
-    addLog(`🏛️ Location "${loc.name}" gebucht! Miete & Werbung im Voraus bezahlt (-${totalUpfrontCost.toFixed(2)} €).`);
+    const dayName = WEEKDAYS[selectedDate.getDay()];
+    addLog(`🏛️ Location "${loc.name}" für ${dayName}, ${formatDate(selectedDate)} gebucht! Miete & Werbung im Voraus bezahlt (-${totalUpfrontCost.toFixed(2)} €).`);
     updateUI();
 }
 
@@ -479,26 +496,30 @@ function advanceDay() {
 }
 
 function executeOwnEvent(eventObj) {
+    const dayOfWeek = eventObj.eventDate.getDay();
+    const weekdayMultiplier = WEEKDAY_DEMAND_MULTIPLIERS[dayOfWeek] || 0.5;
+
     // Visitor Calculation
     const baseDemand = 0.45;
     const priceFactor = Math.max(0.2, 1.2 - (eventObj.ticketPrice / 15.0));
     const reputationFactor = 1.0 + (gameState.reputation / 100.0);
     const marketingBoost = eventObj.marketing.boost;
 
-    let totalAttendanceRatio = baseDemand * priceFactor * reputationFactor * marketingBoost;
-    totalAttendanceRatio = Math.min(1.0, Math.max(0.1, totalAttendanceRatio));
+    let totalAttendanceRatio = baseDemand * priceFactor * reputationFactor * marketingBoost * weekdayMultiplier;
+    totalAttendanceRatio = Math.min(1.0, Math.max(0.05, totalAttendanceRatio));
 
     const visitorCount = Math.floor(eventObj.location.capacity * totalAttendanceRatio);
     const grossIncome = visitorCount * eventObj.ticketPrice;
     const netProfit = grossIncome - eventObj.totalUpfrontCost;
 
-    // Add Income to Giro Konto
+    // Einnahmen aufs Girokonto
     gameState.giroKonto += grossIncome;
-    gameState.reputation += Math.floor(visitorCount / 15);
+    gameState.reputation += Math.max(1, Math.floor(visitorCount / 15));
 
-    addLog(`🎉 Eigene Party @ ${eventObj.location.name} durchgeführt! ${visitorCount} Gäste. Einnahmen: +${grossIncome.toFixed(2)} €.`);
+    const dayName = WEEKDAYS[dayOfWeek];
+    addLog(`🎉 Party @ ${eventObj.location.name} (${dayName}) beendet! ${visitorCount} Gäste. Einnahmen: +${grossIncome.toFixed(2)} €.`);
 
-    // Show Animated Result Modal
+    // Ergebnis-Modal anzeigen
     showEventResultModal(eventObj, visitorCount, grossIncome, netProfit);
 }
 
