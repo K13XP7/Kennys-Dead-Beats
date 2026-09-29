@@ -28,7 +28,7 @@
                         <li class="nav-item" data-tab="messages">Nachrichten ✉</li>
                         <li class="nav-item" data-tab="locations">Locations</li>
                         <li class="nav-item" data-tab="djs">DJs buchen 🎧</li>
-                        <li class="nav-item" data-tab="finances">Finanzen</li>
+                        <li class="nav-item" data-tab="finances">Finanzen 📊</li>
                     </ul>
                 </nav>
             </aside>
@@ -81,8 +81,42 @@
 
                 <!-- Tab 5: Finanzen -->
                 <section id="tab-finances" class="tab-content">
-                    <h2>Finanzübersicht</h2>
-                    <p class="section-desc">Demnächst verfügbar: Einnahmen- und Ausgabenhistorie.</p>
+                    <h2>Finanzübersicht & Kontoauszug 📊</h2>
+                    <p class="section-desc">Detaillierte Übersicht über all deine Einnahmen und Ausgaben:</p>
+                    
+                    <!-- Finanz-Kennzahlen -->
+                    <div class="cards-grid">
+                        <div class="card">
+                            <h3>Gesamteinnahmen</h3>
+                            <p class="stat-number income-text" id="total-income-display">+0.00 €</p>
+                        </div>
+                        <div class="card">
+                            <h3>Gesamtausgaben</h3>
+                            <p class="stat-number expense-text" id="total-expense-display">-0.00 €</p>
+                        </div>
+                        <div class="card">
+                            <h3>Netto-Bilanz</h3>
+                            <p class="stat-number" id="net-balance-display">0.00 €</p>
+                        </div>
+                    </div>
+
+                    <!-- Transaktions-Tabelle -->
+                    <h3 style="margin-top: 30px; margin-bottom: 10px;">Transaktionshistorie</h3>
+                    <div class="table-container">
+                        <table class="finance-table">
+                            <thead>
+                                <tr>
+                                    <th>Tag</th>
+                                    <th>Beschreibung</th>
+                                    <th>Kategorie</th>
+                                    <th>Betrag</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transaction-history">
+                                <!-- Dynamische Buchungen -->
+                            </tbody>
+                        </table>
+                    </div>
                 </section>
 
             </main>
