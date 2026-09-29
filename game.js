@@ -80,7 +80,7 @@ const LOCATIONS = [
         city: "Frankfurt a.M.",
         rent: 900.00,
         capacity: 500,
-        description: "Große Location für Szene-Gigs und Minifestivals. Hohe Miete, aber enormes Potenzial!"
+        description: "Große Location für Szene-Gigs und Minifestivals. Hohe Miete, aber enormer Prestige-Faktor!"
     }
 ];
 
@@ -102,6 +102,15 @@ const WEEKDAY_DEMAND_MULTIPLIERS = {
     6: 1.25  // Samstag
 };
 
+// Vorlagen für zufällige DJ-Anfragen
+const REQUEST_TEMPLATES = [
+    { from: "booking@caveau-mainz.de", location: "Caveau Mainz", genre: "Darkwave & Postpunk", basePay: 180, energyCost: 30 },
+    { from: "orga@stengelvilla.de", location: "Stengelvilla Wiesbaden", genre: "EBM & Industrial", basePay: 250, energyCost: 35 },
+    { from: "events@schlachthof-wiesbaden.de", location: "Kesselhaus Wiesbaden", genre: "Gothic Rock", basePay: 220, energyCost: 30 },
+    { from: "info@datscha-mainz.de", location: "Kultur-Club Mainz", genre: "Synthpop & 80s", basePay: 160, energyCost: 25 },
+    { from: "contact@batchkapp.de", location: "Batschkapp Frankfurt", genre: "Metal & Dark Electro", basePay: 350, energyCost: 40 }
+];
+
 // 2. GAME STATE
 let gameState = {
     currentDate: new Date(2026, 0, 1),
@@ -114,7 +123,7 @@ let gameState = {
     reputation: 10, // Szene-Bekanntheit
     currentJob: null,
     jobContractStart: null,
-    djRequests: [], // Postfach Mails
+    djRequests: [], // Postfach Mails mit Ablaufdatum
     acceptedGigs: [], // Akzeptierte Fremd-Gigs
     plannedEvent: null, // Eigenes geplantes Event
     logs: []
@@ -229,30 +238,60 @@ function acceptJob(jobId, isOnboarding) {
     updateUI();
 }
 
-// 5. DJ MAILBOX (FREMD-GIGS)
+// 5. DJ MAILBOX (DYNAMISCHES POSTFACH MIT AUTO-EXPIRY & NACHVERHANDLUNG)
 function generateInitialDJRequests() {
-    gameState.djRequests = [
-        {
-            id: "req_1",
-            from: "booking@caveau-mainz.de",
-            location: "Caveau Mainz",
-            genre: "Darkwave & Postpunk",
-            dayOfWeek: 5, // Freitag
-            dayText: "Diesen Freitag",
-            pay: 180.00,
-            energyCost: 30
-        },
-        {
-            id: "req_2",
-            from: "orga@stengelvilla.de",
-            location: "Stengelvilla Wiesbaden",
-            genre: "Harsh EBM / Industrial",
-            dayOfWeek: 6, // Samstag
-            dayText: "Diesen Samstag",
-            pay: 250.00,
-            energyCost: 35
+    // Erste Start-Anfragen
+    createSingleRandomRequest(4); // Termin in 4 Tagen
+    createSingleRandomRequest(6); // Termin in 6 Tagen
+}
+
+function createSingleRandomRequest(daysInFuture = null) {
+    const tmpl = REQUEST_TEMPLATES[Math.floor(Math.random() * REQUEST_TEMPLATES.length)];
+    const daysAhead = daysInFuture || Math.floor(Math.random() * 7) + 3; // 3-10 Tage im Voraus
+    
+    const eventDate = new Date(gameState.currentDate);
+    eventDate.setDate(eventDate.getDate() + daysAhead);
+
+    // Ablaufdatum: 3 Tage Zeit zum Antworten
+    const expiryDate = new Date(gameState.currentDate);
+    expiryDate.setDate(expiryDate.getDate() + 3);
+
+    // Ruf-Bonus auf das Honorar
+    const repBonus = Math.floor(gameState.reputation * 1.5);
+    const pay = tmpl.basePay + repBonus;
+
+    const newReq = {
+        id: "req_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        from: tmpl.from,
+        location: tmpl.location,
+        genre: tmpl.genre,
+        eventDate: eventDate,
+        expiryDate: expiryDate,
+        pay: pay,
+        energyCost: tmpl.energyCost,
+        isCounterOffer: false
+    };
+
+    gameState.djRequests.push(newReq);
+}
+
+function processMailboxExpiration() {
+    // A. Überprüfe abgelaufene Mails
+    const beforeCount = gameState.djRequests.length;
+    
+    gameState.djRequests = gameState.djRequests.filter(req => {
+        if (gameState.currentDate >= req.expiryDate) {
+            addLog(`⌛ Die DJ-Anfrage für ${req.location} ist abgelaufen und verfallen.`);
+            return false;
         }
-    ];
+        return true;
+    });
+
+    // B. Chance auf neue Anfragen pro Tag (ca. 40% Chance täglich)
+    if (Math.random() < 0.40 && gameState.djRequests.length < 4) {
+        createSingleRandomRequest();
+        addLog(`📩 Neue DJ-Anfrage im Postfach eingetroffen!`);
+    }
 }
 
 function renderMailbox() {
@@ -266,12 +305,27 @@ function renderMailbox() {
 
     container.innerHTML = '';
     gameState.djRequests.forEach(req => {
+        const dayName = WEEKDAYS[req.eventDate.getDay()];
+        const formattedDate = formatDate(req.eventDate);
+        
+        // Verbleibende Tage zum Antworten
+        const diffTime = req.expiryDate - gameState.currentDate;
+        const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
         const card = document.createElement('div');
         card.className = 'mail-card';
         card.innerHTML = `
-            <div class="mail-header">✉️ Von: ${req.from}</div>
+            <div class="mail-header">
+                <span>✉️ Von: ${req.from}</span>
+                <span class="expires-text">⏳ Läuft ab in: ${diffDays} Tag(en)</span>
+            </div>
             <p><strong>Gig @ ${req.location}</strong> (${req.genre})</p>
-            <p class="small-text">Wochentag: ${req.dayText} | Honorar: <strong style="color: #00e676;">+${req.pay.toFixed(2)} €</strong> | Aufwand: -${req.energyCost} Energie</p>
+            <p style="margin-top: 5px;">Termin: <strong>${dayName}, ${formattedDate}</strong></p>
+            <p class="small-text">
+                Honorar: <strong style="color: #00e676;">+${req.pay.toFixed(2)} €</strong> 
+                ${req.isCounterOffer ? ' <span style="color: #ffaa00;">(Besseres Nachangebot!)</span>' : ''} | 
+                Aufwand: -${req.energyCost} Energie
+            </p>
             <div class="mail-actions">
                 <button class="secondary-btn" style="padding: 5px 10px; font-size: 0.85rem;" onclick="acceptDJRequest('${req.id}')">Annehmen 👍</button>
                 <button class="secondary-btn" style="padding: 5px 10px; font-size: 0.85rem;" onclick="declineDJRequest('${req.id}')">Ablehnen 👎</button>
@@ -286,16 +340,44 @@ function acceptDJRequest(reqId) {
     if (reqIndex === -1) return;
 
     const req = gameState.djRequests[reqIndex];
-    gameState.acceptedGigs.push({ ...req, targetDateDay: req.dayOfWeek });
+    gameState.acceptedGigs.push({ ...req });
     gameState.djRequests.splice(reqIndex, 1);
 
-    addLog(`DJ-Gig @ ${req.location} für ${req.dayText} zugesagt! Honorar: +${req.pay.toFixed(2)} €.`);
+    const dayName = WEEKDAYS[req.eventDate.getDay()];
+    addLog(`DJ-Gig @ ${req.location} für ${dayName}, ${formatDate(req.eventDate)} zugesagt! Honorar: +${req.pay.toFixed(2)} €.`);
     updateUI();
 }
 
 function declineDJRequest(reqId) {
-    gameState.djRequests = gameState.djRequests.filter(r => r.id !== reqId);
-    addLog(`DJ-Anfrage abgelehnt.`);
+    const reqIndex = gameState.djRequests.findIndex(r => r.id === reqId);
+    if (reqIndex === -1) return;
+
+    const req = gameState.djRequests[reqIndex];
+    gameState.djRequests.splice(reqIndex, 1);
+
+    // 30 % CHANCE AUF EIN BESSERES GEGENANGEBOT BEI ABSAGE!
+    if (!req.isCounterOffer && Math.random() < 0.30) {
+        const bonusPercent = 0.25 + (Math.random() * 0.25); // +25% bis +50% mehr Gage
+        const newPay = req.pay * (1 + bonusPercent);
+
+        // Neues Ablaufdatum (+2 Tage)
+        const newExpiry = new Date(gameState.currentDate);
+        newExpiry.setDate(newExpiry.getDate() + 2);
+
+        const counterReq = {
+            ...req,
+            id: "counter_" + Date.now(),
+            pay: newPay,
+            expiryDate: newExpiry,
+            isCounterOffer: true
+        };
+
+        gameState.djRequests.push(counterReq);
+        addLog(`💬 ${req.location} hat dein Angebot nachverhandelt und bietet nun ${newPay.toFixed(2)} €! (+${Math.round(bonusPercent*100)}%)`);
+    } else {
+        addLog(`DJ-Anfrage von ${req.location} abgelehnt.`);
+    }
+
     updateUI();
 }
 
@@ -449,7 +531,7 @@ function advanceDay() {
     }
 
     // B. Accepted Fremd-Gig tonight?
-    const gigIndex = gameState.acceptedGigs.findIndex(g => g.targetDateDay === dayOfWeek);
+    const gigIndex = gameState.acceptedGigs.findIndex(g => isSameDate(gameState.currentDate, g.eventDate));
     if (gigIndex !== -1) {
         didGig = true;
         const gig = gameState.acceptedGigs[gigIndex];
@@ -483,6 +565,9 @@ function advanceDay() {
 
     // Reset Energy Drink counter
     gameState.energyDrinksDrunkToday = 0;
+
+    // Process Mailbox Expirations & New Mails
+    processMailboxExpiration();
 
     // Advance Date
     gameState.currentDate.setDate(gameState.currentDate.getDate() + 1);
