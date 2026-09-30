@@ -3,161 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rhein-Main DJ & Event Manager</title>
+    <title>Graveyard Noise - Dark Scene DJ Manager</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Onboarding Modal: Jobauswahl beim Spielstart -->
-    <div id="onboarding-modal" class="modal">
-        <div class="modal-content onboarding-card">
-            <h2>Willkommen in der Rhein-Main Szene! 🎧</h2>
-            <p>Bevor du dein erstes Event planst, wähle bitte deinen Einstiegsjob im Handel oder Gewerbe aus:</p>
-            <div id="onboarding-job-list" class="job-grid"></div>
-        </div>
-    </div>
-
-    <!-- Event-Result Modal (Animierte Auswertung am Morgen nach der Party) -->
-    <div id="event-result-modal" class="modal" style="display: none;">
-        <div class="modal-content result-card">
-            <h2 id="res-event-title">🎉 Party-Auswertung</h2>
-            <p id="res-event-date" class="small-text">Datum des Events</p>
-            <hr class="divider">
-
-            <div class="result-step" id="step-visitors">
-                <h3>🎟️ Besucherzahlen</h3>
-                <p id="res-visitors-text">Berechne Gäste...</p>
+    <div class="game-container">
+        <!-- 1. STARTBILDSCHIRM / HAUPTMENÜ -->
+        <section id="start-screen" class="screen active">
+            <div class="hero-title">
+                <h1>GRAVEYARD NOISE</h1>
+                <p class="subtitle">DARK SCENE DJ MANAGER</p>
             </div>
 
-            <div class="result-step" id="step-finances" style="margin-top: 15px;">
-                <h3>💰 Finanz-Abrechnung</h3>
-                <p id="res-income-text">Ticket-Einnahmen: 0.00 €</p>
-                <p id="res-costs-text">Vorausbezahlte Kosten (Miete + Werbung): 0.00 €</p>
+            <div class="menu-actions">
+                <button id="btn-new-game" class="btn primary">▶ Neue Karriere</button>
+                <button id="btn-continue" class="btn secondary" disabled>📂 Spiel fortsetzen</button>
+                <button id="btn-settings" class="btn secondary">⚙️ Einstellungen</button>
             </div>
 
-            <div class="result-step" id="step-total" style="margin-top: 20px;">
-                <h3>📊 Endergebnis</h3>
-                <p id="res-total-text" class="stat-value">+0.00 €</p>
-            </div>
+            <div id="save-info" class="save-info-text">Kein Speicherstand vorhanden</div>
+        </section>
 
-            <button class="primary-btn" style="margin-top: 25px;" onclick="closeEventResultModal()">Weiter ins Dashboard ⏩</button>
-        </div>
-    </div>
-
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <h1 class="logo">Rhein-Main DJ</h1>
-            <nav class="nav-menu">
-                <button class="nav-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
-                <button class="nav-btn" onclick="switchTab('jobboerse')">💼 Jobbörse</button>
-                <button class="nav-btn" onclick="switchTab('finanzen')">🏦 Bank & Finanzen</button>
-                <button class="nav-btn" onclick="switchTab('events')">🎉 Event-Planung</button>
-            </nav>
-            <div class="time-controls">
-                <div class="date-display" id="date-display">Mo, 01.01.2026</div>
-                <button class="primary-btn" id="next-day-btn" onclick="advanceDay()">Nächster Tag ⏩</button>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
+        <!-- 2. ONBOARDING / DJ-ERSTELLUNG -->
+        <section id="onboarding-screen" class="screen hidden">
+            <h2>🦇 erstelle deine Identität</h2>
             
-            <!-- Dashboard Tab -->
-            <section id="dashboard" class="tab-content active">
-                <h2>Übersicht</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Girokonto</h3>
-                        <p class="stat-value" id="giro-val">0,00 €</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Sparkonto</h3>
-                        <p class="stat-value" id="spar-val">0,00 €</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Aktueller Job</h3>
-                        <p class="stat-value" id="job-val">Kein Job</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Energie</h3>
-                        <p class="stat-value" id="energyDisplay">100 / 100</p>
-                        <div style="margin-top: 15px; border-top: 1px solid #29292e; padding-top: 10px;">
-                            <button id="btnEnergyDrink" onclick="buyEnergyDrink()" class="btn-action">
-                                ⚡ Energy Drink (10 €)
-                            </button>
-                            <div id="drinkCountDisplay" style="font-size: 0.8rem; color: #a8a8b3; margin-top: 5px;">
-                                Heute getrunken: 0 / 5
-                            </div>
-                        </div>
-                    </div>
+            <form id="dj-form">
+                <div class="form-group">
+                    <label for="dj-name">Künstlername / DJ-Name:</label>
+                    <input type="text" id="dj-name" placeholder="z.B. DJ Shadow, Nightshade..." required>
                 </div>
 
-                <!-- DJ Mailbox / Requests -->
-                <div class="info-card highlight-card" style="margin-bottom: 25px;">
-                    <h3>✉️ Postfach: DJ-Anfragen (Fremd-Gigs)</h3>
-                    <div id="dj-mailbox-list">
-                        <p class="small-text">Keine neuen Anfragen vorhanden.</p>
-                    </div>
+                <div class="form-group">
+                    <label for="dj-genre">Haupt-Genre / Szene-Fokus:</label>
+                    <select id="dj-genre">
+                        <option value="Batcave & Deathrock">🦇 Batcave & Deathrock</option>
+                        <option value="Darkwave & Coldwave">🎹 Darkwave & Coldwave</option>
+                        <option value="EBM & Industrial">⚙️ EBM & Industrial</option>
+                        <option value="Post-Punk & Gothic Rock">🎸 Post-Punk & Gothic Rock</option>
+                    </select>
                 </div>
 
-                <div class="info-card">
-                    <h3>Status & Nachrichten</h3>
-                    <ul id="log-list" class="log-list"></ul>
-                </div>
-            </section>
-
-            <!-- Jobbörse Tab -->
-            <section id="jobboerse" class="tab-content">
-                <h2>Jobbörse & Karriere 💼</h2>
-                <div class="info-card highlight-card">
-                    <h3>Dein Aktueller Arbeitsvertrag</h3>
-                    <div id="current-job-details">
-                        <p>Lade Vertragsdaten...</p>
-                    </div>
-                </div>
-                <h3>Verfügbare Stellenangebote</h3>
-                <div id="job-board-list" class="job-grid"></div>
-            </section>
-
-            <!-- Finanzen Tab -->
-            <section id="finanzen" class="tab-content">
-                <h2>Bank & Finanzen 🏦</h2>
-                <div class="finance-grid">
-                    <div class="info-card">
-                        <h3>Girokonto & Fixkosten</h3>
-                        <p><strong>Guthaben:</strong> <span id="fin-giro">0,00 €</span></p>
-                        <p><strong>Monatliche Fixkosten (Miete + Strom):</strong> <span id="fin-fixkosten">750,00 €</span></p>
-                        <p class="small-text">* Werden automatisch am 1. des Monats abgebucht.</p>
-                    </div>
-
-                    <div class="info-card">
-                        <h3>Sparkonto (Zins: 3.0 % p.a.)</h3>
-                        <p><strong>Guthaben:</strong> <span id="fin-spar">0,00 €</span></p>
-                        <div class="bank-actions">
-                            <input type="number" id="bank-amount" placeholder="Betrag in €" min="1">
-                            <button class="secondary-btn" onclick="depositSavings()">Einzahlen 📥</button>
-                            <button class="secondary-btn" onclick="withdrawSavings()">Auszahlen 📤</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Events Tab -->
-            <section id="events" class="tab-content">
-                <h2>Event-Planung 🎉</h2>
-                
-                <!-- Active Event Card if booked -->
-                <div id="active-event-status" class="info-card highlight-card" style="margin-bottom: 25px;">
-                    <h3>Geplante eigene Veranstaltung</h3>
-                    <p id="active-event-details">Aktuell ist keine eigene Party geplant.</p>
+                <div class="form-group">
+                    <label for="dj-region">Start-Region:</label>
+                    <select id="dj-region">
+                        <option value="Provinz">Szene-Provinz (Günstige Miete, kleine Kneipen, weniger Konkurrenz)</option>
+                        <option value="Metropole">Szene-Metropole (Hohe Miete, große Clubs, schnellerer Ruf-Aufbau)</option>
+                    </select>
                 </div>
 
-                <h3>Location Buchen & Party Organisieren</h3>
-                <div id="location-list" class="job-grid"></div>
-            </section>
+                <div class="form-group">
+                    <label for="dj-job">Brotjob (Tagessicherung):</label>
+                    <select id="dj-job">
+                        <option value="Plattenladen-Aushilfe">Plattenladen-Aushilfe (Wenig Gehalt, bringt Szene-Wissen)</option>
+                        <option value="Barkeeper im Szenelokal">Barkeeper im Szenelokal (Mäßiges Gehalt, gute Kontakte)</option>
+                        <option value="Lagerarbeiter">Lagerarbeiter (Solides Gehalt, mehr Zeit für Musik)</option>
+                    </select>
+                </div>
 
-        </main>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Karriere Starten ⚰️</button>
+                    <button type="button" id="btn-back-to-menu" class="btn danger">Zurück</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- 3. MAIN GAME DASHBOARD -->
+        <section id="dashboard-screen" class="screen hidden">
+            <header class="hud">
+                <div class="hud-item"><strong id="hud-name">DJ Name</strong></div>
+                <div class="hud-item">Genre: <span id="hud-genre">-</span></div>
+                <div class="hud-item">Region: <span id="hud-region">-</span></div>
+                <div class="hud-item">Geld: <span id="hud-money">0</span> €</div>
+                <div class="hud-item">Reputation: <span id="hud-rep">0</span></div>
+            </header>
+
+            <main class="dashboard-content">
+                <h3>Willkommen in der Dunkelheit.</h3>
+                <p>Deine Karriere hat begonnen. Aktueller Brotjob: <span id="hud-job">-</span>.</p>
+                <div class="dashboard-buttons">
+                    <button id="btn-save" class="btn secondary">💾 Spiel Speichern</button>
+                    <button id="btn-quit" class="btn danger">🚪 Hauptmenü</button>
+                </div>
+            </main>
+        </section>
     </div>
 
     <script src="game.js"></script>
