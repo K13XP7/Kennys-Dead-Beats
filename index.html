@@ -3,73 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Graveyard Noise - Dark Scene DJ Manager</title>
+    <title>Graveyard Noise - DJ Simulator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="game-container">
-        <!-- 1. STARTBILDSCHIRM / HAUPTMENÜ -->
-        <section id="start-screen" class="screen active">
-            <div class="hero-title">
-                <h1>GRAVEYARD NOISE</h1>
-                <p class="subtitle">DARK SCENE DJ MANAGER</p>
+
+        <!-- 1. START SCREEN -->
+        <section id="start-screen" class="screen">
+            <div class="logo-area">
+                <h1 class="title">GRAVEYARD NOISE</h1>
+                <p class="subtitle">Goth & Darkwave DJ Manager</p>
             </div>
 
-            <div class="menu-actions">
-                <button id="btn-new-game" class="btn primary">▶ Neue Karriere</button>
-                <button id="btn-continue" class="btn secondary" disabled>📂 Spiel fortsetzen</button>
-                <button id="btn-settings" class="btn secondary">⚙️ Einstellungen</button>
+            <div class="menu-buttons">
+                <button id="btn-new-game" class="btn primary">⚰️ Neues Spiel</button>
+                <button id="btn-continue" class="btn secondary" disabled>💾 Spiel fortsetzen</button>
             </div>
 
-            <div id="save-info" class="save-info-text">Kein Speicherstand vorhanden</div>
+            <div class="save-status">
+                <p id="save-info">Kein Speicherstand vorhanden</p>
+            </div>
         </section>
 
-        <!-- 2. ONBOARDING / DJ-ERSTELLUNG -->
+        <!-- 2. ONBOARDING SCREEN -->
         <section id="onboarding-screen" class="screen hidden">
-            <h2>🦇 erstelle deine Identität</h2>
-            
+            <h2>Erschaffe deine DJ-Identität</h2>
             <form id="dj-form">
                 <div class="form-group">
-                    <label for="dj-name">Künstlername / DJ-Name:</label>
-                    <input type="text" id="dj-name" placeholder="z.B. DJ Shadow, Nightshade..." required>
+                    <label for="dj-name">DJ-Name / Pseudonym:</label>
+                    <input type="text" id="dj-name" placeholder="z. B. DJ Ashes, Nocturna..." required>
                 </div>
 
                 <div class="form-group">
-                    <label for="dj-genre">Haupt-Genre / Szene-Fokus:</label>
+                    <label for="dj-genre">Spezialisierung / Genre:</label>
                     <select id="dj-genre">
-                        <option value="Batcave & Deathrock">🦇 Batcave & Deathrock</option>
-                        <option value="Darkwave & Coldwave">🎹 Darkwave & Coldwave</option>
-                        <option value="EBM & Industrial">⚙️ EBM & Industrial</option>
-                        <option value="Post-Punk & Gothic Rock">🎸 Post-Punk & Gothic Rock</option>
+                        <option value="Batcave / Deathrock">Batcave / Deathrock</option>
+                        <option value="EBM / Industrial">EBM / Industrial</option>
+                        <option value="Darkwave / Post-Punk">Darkwave / Post-Punk</option>
+                        <option value="Goth-Rock / Coldwave">Goth-Rock / Coldwave</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="dj-region">Start-Region:</label>
                     <select id="dj-region">
-                        <option value="Provinz">Szene-Provinz (Günstige Miete, kleine Kneipen, weniger Konkurrenz)</option>
-                        <option value="Metropole">Szene-Metropole (Hohe Miete, große Clubs, schnellerer Ruf-Aufbau)</option>
+                        <option value="Provinz">Provinz (Günstige Miete, wenige Szene-Clubs)</option>
+                        <option value="Metropole">Metropole (Hohe Miete, große Szene & viele Gigs)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="dj-job">Brotjob (Tagessicherung):</label>
+                    <label for="dj-job">Brotjob (Tageseinkommen):</label>
                     <select id="dj-job">
-                        <option value="Plattenladen-Aushilfe">Plattenladen-Aushilfe (Wenig Gehalt, bringt Szene-Wissen)</option>
-                        <option value="Barkeeper im Szenelokal">Barkeeper im Szenelokal (Mäßiges Gehalt, gute Kontakte)</option>
-                        <option value="Lagerarbeiter">Lagerarbeiter (Solides Gehalt, mehr Zeit für Musik)</option>
+                        <option value="Plattenladen-Aushilfe">Plattenladen-Aushilfe (Wenig Geld, gut für Musikwissen)</option>
+                        <option value="Barkeeper im Szenelokal">Barkeeper im Szenelokal (Solides Geld, Kontakte knüpfen)</option>
+                        <option value="Lagerarbeiter">Lagerarbeiter (Viel Geld, raubt viel Energie)</option>
                     </select>
                 </div>
 
-                <div class="form-actions">
-                    <button type="submit" class="btn primary">Karriere Starten ⚰️</button>
-                    <button type="button" id="btn-back-to-menu" class="btn danger">Zurück</button>
+                <div class="form-buttons">
+                    <button type="submit" id="btn-start-game" class="btn primary">Karriere starten 🦇</button>
+                    <button type="button" id="btn-back-to-menu" class="btn secondary">Zurück</button>
                 </div>
             </form>
         </section>
 
-       <!-- 3. MAIN GAME DASHBOARD -->
+        <!-- 3. MAIN GAME DASHBOARD -->
         <section id="dashboard-screen" class="screen hidden">
             <header class="hud">
                 <div class="hud-item"><strong id="hud-name">DJ Name</strong></div>
@@ -78,14 +79,7 @@
                 <div class="hud-item">Energie: <span id="hud-energy">100</span>%</div>
                 <div class="hud-item">Reputation: <span id="hud-rep">0</span></div>
             </header>
-<!-- NEU: ANFRAGEN & GIGS -->
-                <div class="gig-mailbox">
-                    <h4>📥 Eingehende Gig-Anfragen:</h4>
-                    <div id="gig-list">
-                        <p class="no-gigs">Keine aktuellen Anfragen diese Woche.</p>
-                    </div>
-                </div>
-            
+
             <main class="dashboard-content">
                 <div class="status-bar">
                     <p><strong>Brotjob:</strong> <span id="hud-job">-</span> | <strong>Region:</strong> <span id="hud-region">-</span></p>
@@ -114,6 +108,14 @@
                     </div>
                 </div>
 
+                <!-- ANFRAGEN & GIGS -->
+                <div class="gig-mailbox">
+                    <h4>📥 Eingehende Gig-Anfragen:</h4>
+                    <div id="gig-list">
+                        <p class="no-gigs">Keine aktuellen Anfragen diese Woche.</p>
+                    </div>
+                </div>
+
                 <!-- Log-Bereich für Ereignisse -->
                 <div class="event-log">
                     <h4>⚰️ Chronik der Woche:</h4>
@@ -131,13 +133,13 @@
                 </div>
             </main>
         </section>
+
     </div>
 
-    <script src="game.js"></script>
-<!-- WOCHENAUSWERTUNG MODAL / POPUP -->
+    <!-- WOCHENAUSWERTUNG MODAL / POPUP -->
     <div id="summary-modal" class="modal hidden">
         <div class="modal-content">
-            <h3>⚰️️ Wochenbilanz (KW <span id="summary-week">1</span>)</h3>
+            <h3>⚰️ Wochenbilanz (KW <span id="summary-week">1</span>)</h3>
             
             <div class="summary-section">
                 <h4>📊 Party & Gäste</h4>
@@ -156,5 +158,7 @@
             <button id="btn-close-summary" class="btn primary" style="width: 100%; margin-top: 1rem;">Weiter zur nächsten Woche 🦇</button>
         </div>
     </div>
+
+    <script src="game.js"></script>
 </body>
 </html>
