@@ -159,3 +159,81 @@ input:focus, select:focus {
     padding: 0.4rem 0.8rem;
     border-radius: 4px;
 }
+/* --- WOCHEN-PLANNER & DASHBOARD ERWEITERUNGEN --- */
+.status-bar {
+    background: #0e0e12;
+    padding: 0.6rem;
+    border-left: 3px solid var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+}
+
+.instruction {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.week-planner {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.plan-card {
+    background: #101014;
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.plan-card h4 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.plan-card select {
+    width: 100%;
+}
+
+.event-log {
+    background: #08080a;
+    border: 1px solid var(--border-color);
+    padding: 0.8rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.event-log h4 {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.event-log ul {
+    list-style: none;
+    font-size: 0.8rem;
+}
+
+.event-log li {
+    padding: 0.2rem 0;
+    border-bottom: 1px dashed #1a1a22;
+}
+
+.event-log li:last-child {
+    border-bottom: none;
+}
+
+.sub-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.sub-buttons .btn {
+    flex: 1;
+}
