@@ -85,6 +85,7 @@ function loadGame() {
 }
 
 function resetWeeklyStats() {
+    if (!gameState) return;
     gameState.weeklyStats = {
         income: 0,
         expenses: 0,
@@ -112,8 +113,14 @@ btnCloseSummary.addEventListener('click', () => {
 djForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const nameInput = document.getElementById('dj-name').value.trim();
+    if (!nameInput) {
+        alert("Bitte gib einen DJ-Namen ein!");
+        return;
+    }
+
     gameState = {
-        djName: document.getElementById('dj-name').value.trim(),
+        djName: nameInput,
         genre: document.getElementById('dj-genre').value,
         region: document.getElementById('dj-region').value,
         job: document.getElementById('dj-job').value,
@@ -197,7 +204,6 @@ btnNextWeek.addEventListener('click', () => {
     gameState.week++;
     gameState.logs = [];
 
-    // Reset der Statistik für diese Woche vor Berechnungen
     const summaryStats = {
         week: currentWeekNumber,
         income: gameState.weeklyStats.income,
@@ -266,10 +272,7 @@ btnNextWeek.addEventListener('click', () => {
         addLog(`💀 BURNOUT! Notfall-Rast nötig. Arztrechnung: -40 €`);
     }
 
-    // Zusammenfassung anzeigen
     showSummaryModal(summaryStats);
-
-    // Werte für nächste Woche zurücksetzen
     resetWeeklyStats();
     generateGigOffers();
     updateDashboard();
