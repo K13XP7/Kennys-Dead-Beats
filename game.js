@@ -14,11 +14,13 @@ const btnSave = document.getElementById('btn-save');
 const btnQuit = document.getElementById('btn-quit');
 const btnBackToMenu = document.getElementById('btn-back-to-menu');
 const btnNextWeek = document.getElementById('btn-next-week');
+const btnCloseSummary = document.getElementById('btn-close-summary');
 
 const saveInfoText = document.getElementById('save-info');
 const djForm = document.getElementById('dj-form');
 const logList = document.getElementById('log-list');
 const gigListContainer = document.getElementById('gig-list');
+const summaryModal = document.getElementById('summary-modal');
 
 // Brotjob-Gehälter
 const jobSalaries = {
@@ -27,12 +29,12 @@ const jobSalaries = {
     "Lagerarbeiter": 220
 };
 
-// Mögliche Gig-Locations basierend auf Reputation
+// Mögliche Gigs
 const possibleGigs = [
-    { title: "Düster-Spelunke 'Der Sarg'", minRep: 0, minSkill: 5, pay: 60, repReward: 2, energyCost: 30, desc: "Kleine Kneipe, feuchter Keller. Perfekt für die ersten Gehversuche." },
-    { title: "Jugendzentrum 'Katakombe'", minRep: 5, minSkill: 12, pay: 110, repReward: 4, energyCost: 35, desc: "Szenetreff für Nachwuchs-Goths. Solide Anlage, dankbares Publikum." },
-    { title: "Untergrund-Club 'Schattenwerk'", minRep: 15, minSkill: 20, pay: 220, repReward: 7, energyCost: 45, desc: "Bekannter Szene-Club. Hier schauen auch auswärtige DJs vorbei." },
-    { title: "Industrial Festival 'Maschinensturm'", minRep: 35, minSkill: 35, pay: 450, repReward: 15, energyCost: 60, desc: "Große Halle, harte Bässe. Dein erster großer Festival-Slot!" }
+    { title: "Düster-Spelunke 'Der Sarg'", minRep: 0, minSkill: 5, pay: 60, repReward: 2, energyCost: 30, desc: "Kleine Kneipe, feuchter Keller. Perfekt für die ersten Gehversuche.", avgGuests: 35 },
+    { title: "Jugendzentrum 'Katakombe'", minRep: 5, minSkill: 12, pay: 110, repReward: 4, energyCost: 35, desc: "Szenetreff für Nachwuchs-Goths. Solide Anlage, dankbares Publikum.", avgGuests: 85 },
+    { title: "Untergrund-Club 'Schattenwerk'", minRep: 15, minSkill: 20, pay: 220, repReward: 7, energyCost: 45, desc: "Bekannter Szene-Club. Hier schauen auch auswärtige DJs vorbei.", avgGuests: 210 },
+    { title: "Industrial Festival 'Maschinensturm'", minRep: 35, minSkill: 35, pay: 450, repReward: 15, energyCost: 60, desc: "Große Halle, harte Bässe. Dein erster großer Festival-Slot!", avgGuests: 650 }
 ];
 
 // --- INITIALISIERUNG ---
@@ -75,10 +77,20 @@ function loadGame() {
         if (!gameState.energy) gameState.energy = 100;
         if (!gameState.currentGigs) gameState.currentGigs = [];
         if (!gameState.logs) gameState.logs = ["Spielstand geladen."];
+        if (!gameState.weeklyStats) resetWeeklyStats();
         
         updateDashboard();
         showScreen('dashboard');
     }
+}
+
+function resetWeeklyStats() {
+    gameState.weeklyStats = {
+        income: 0,
+        expenses: 0,
+        guests: 0,
+        crowdMood: "Keine Party gespielt"
+    };
 }
 
 // --- EVENT HANDLER ---
@@ -90,6 +102,10 @@ btnSave.addEventListener('click', saveGame);
 btnQuit.addEventListener('click', () => {
     checkExistingSave();
     showScreen('start');
+});
+
+btnCloseSummary.addEventListener('click', () => {
+    summaryModal.classList.add('hidden');
 });
 
 // Neues Spiel starten
@@ -110,6 +126,7 @@ djForm.addEventListener('submit', (e) => {
         logs: ["Karriere gestartet in der Region: " + document.getElementById('dj-region').value]
     };
 
+    resetWeeklyStats();
     generateGigOffers();
     updateDashboard();
     showScreen('dashboard');
@@ -118,7 +135,6 @@ djForm.addEventListener('submit', (e) => {
 // --- GIG-GENERATOR ---
 function generateGigOffers() {
     gameState.currentGigs = [];
-    // Chance auf Gig-Anfrage basierend auf Reputation
     possibleGigs.forEach(gig => {
         if (gameState.reputation >= gig.minRep && Math.random() > 0.4) {
             gameState.currentGigs.push(gig);
@@ -134,29 +150,40 @@ function playGig(gigIndex) {
         return;
     }
 
-    // Erfolgswahrscheinlichkeit basierend auf Skill
     const successRate = Math.min(100, (gameState.skill / gig.minSkill) * 80);
     const roll = Math.random() * 100;
 
     gameState.energy -= gig.energyCost;
 
     if (roll <= successRate) {
-        // Erfolgreicher Gig
+        // Erfolgreich
         const tip = Math.floor(Math.random() * 20) + 10;
         const totalEarnings = gig.pay + tip;
         gameState.money += totalEarnings;
         gameState.reputation += gig.repReward;
         gameState.skill += 2;
-        addLog(`🦇 GIG ERFOLG in '${gig.title}'! Gage: ${gig.pay}€ + ${tip}€ Trinkgeld. Rep: +${gig.repReward}`);
+
+        // Stat Tracker
+        const actualGuests = Math.floor(gig.avgGuests * (0.8 + Math.random() * 0.4));
+        gameState.weeklyStats.income += totalEarnings;
+        gameState.weeklyStats.guests += actualGuests;
+        gameState.weeklyStats.crowdMood = "🔥 Ekstase & Begeisterung!";
+
+        addLog(`🦇 GIG ERFOLG in '${gig.title}'! Gage: ${gig.pay}€ + ${tip}€ Trinkgeld (${actualGuests} Gäste).`);
     } else {
-        // Desaster-Gig (Übergänge verpatzt etc.)
+        // Reinfall
         const halfPay = Math.floor(gig.pay / 2);
         gameState.money += halfPay;
         gameState.reputation = Math.max(0, gameState.reputation - 1);
-        addLog(`💀 GIG PANNENSHOW in '${gig.title}'... Set verpatzt. Nur ${halfPay}€ Gage bekommen. Rep: -1`);
+
+        const actualGuests = Math.floor(gig.avgGuests * 0.5);
+        gameState.weeklyStats.income += halfPay;
+        gameState.weeklyStats.guests += actualGuests;
+        gameState.weeklyStats.crowdMood = "💀 Enttäuschte Blicke & Leere Tanzfläche";
+
+        addLog(`💀 GIG PANNENSHOW in '${gig.title}'... Set verpatzt. Nur ${halfPay}€ Gage bekommen.`);
     }
 
-    // Gig aus der Liste entfernen
     gameState.currentGigs.splice(gigIndex, 1);
     updateDashboard();
 }
@@ -166,18 +193,30 @@ btnNextWeek.addEventListener('click', () => {
     const weekdayAction = document.getElementById('select-weekday').value;
     const weekendAction = document.getElementById('select-weekend').value;
 
+    const currentWeekNumber = gameState.week;
     gameState.week++;
     gameState.logs = [];
+
+    // Reset der Statistik für diese Woche vor Berechnungen
+    const summaryStats = {
+        week: currentWeekNumber,
+        income: gameState.weeklyStats.income,
+        expenses: 0,
+        guests: gameState.weeklyStats.guests,
+        crowdMood: gameState.weeklyStats.crowdMood
+    };
 
     // 1. Unter der Woche
     if (weekdayAction === 'work') {
         const salary = jobSalaries[gameState.job] || 100;
         gameState.money += salary;
+        summaryStats.income += salary;
         gameState.energy -= 40;
         addLog(`💼 Brotjob: +${salary} € | -40% Energie`);
     } else if (weekdayAction === 'digging') {
         if (gameState.money >= 50) {
             gameState.money -= 50;
+            summaryStats.expenses += 50;
             gameState.skill += 3;
             gameState.energy -= 20;
             addLog(`🎧 Platten gediggt: -50 €, DJ-Skill +3 | -20% Energie`);
@@ -193,9 +232,14 @@ btnNextWeek.addEventListener('click', () => {
     if (weekendAction === 'club') {
         if (gameState.money >= 30) {
             gameState.money -= 30;
+            summaryStats.expenses += 30;
             gameState.reputation += 2;
             gameState.energy -= 30;
             addLog(`🦇 Szene-Club Netzwerken: -30 €, Reputation +2 | -30% Energie`);
+            if (summaryStats.guests === 0) {
+                summaryStats.guests = Math.floor(Math.random() * 40) + 20;
+                summaryStats.crowdMood = "💃 Gute Stimmung beim Clubbesuch";
+            }
         } else {
             addLog(`⚠️ Kein Geld für den Club-Eintritt!`);
         }
@@ -211,19 +255,40 @@ btnNextWeek.addEventListener('click', () => {
     // 3. Miete
     const rent = gameState.region === 'Metropole' ? 80 : 45;
     gameState.money -= rent;
-    addLog(`🏚️️ Miete bezahlt: -${rent} €`);
+    summaryStats.expenses += rent;
+    addLog(`🏚 Miete bezahlt: -${rent} €`);
 
     // Burnout Check
     if (gameState.energy <= 0) {
         gameState.energy = 30;
         gameState.money -= 40;
+        summaryStats.expenses += 40;
         addLog(`💀 BURNOUT! Notfall-Rast nötig. Arztrechnung: -40 €`);
     }
 
-    // Neue Gigs für die nächste Woche generieren
+    // Zusammenfassung anzeigen
+    showSummaryModal(summaryStats);
+
+    // Werte für nächste Woche zurücksetzen
+    resetWeeklyStats();
     generateGigOffers();
     updateDashboard();
 });
+
+function showSummaryModal(stats) {
+    document.getElementById('summary-week').textContent = stats.week;
+    document.getElementById('summary-guests').textContent = stats.guests;
+    document.getElementById('summary-crowd-mood').textContent = stats.crowdMood;
+    document.getElementById('summary-income').textContent = stats.income;
+    document.getElementById('summary-expenses').textContent = stats.expenses;
+    
+    const balance = stats.income - stats.expenses;
+    const balanceEl = document.getElementById('summary-balance');
+    balanceEl.textContent = (balance >= 0 ? "+" : "") + balance;
+    balanceEl.style.color = balance >= 0 ? "#4caf50" : "#f44336";
+
+    summaryModal.classList.remove('hidden');
+}
 
 // Hilfsfunktionen
 function addLog(message) {
@@ -247,7 +312,7 @@ function updateDashboard() {
         logList.appendChild(li);
     });
 
-    // Gig-Anfragen darstellen
+    // Gig-Anfragen
     gigListContainer.innerHTML = '';
     if (!gameState.currentGigs || gameState.currentGigs.length === 0) {
         gigListContainer.innerHTML = '<p class="no-gigs">Keine aktuellen Anfragen diese Woche.</p>';
