@@ -1,19 +1,19 @@
 :root {
-    --bg-color: #0a0a0c;
-    --card-bg: #141419;
-    --border-color: #2a2a35;
-    --primary-color: #8b0000; /* Deep Crimson Red */
-    --primary-hover: #b22222;
+    --bg-color: #0d0d11;
+    --card-bg: #16161e;
+    --primary-color: #ba0c2f;
+    --primary-hover: #e6193c;
     --text-color: #e0e0e6;
-    --text-muted: #888899;
-    --neon-accent: #9400d3; /* Dark Violet */
+    --text-muted: #8a8a99;
+    --border-color: #2a2a36;
+    --danger-color: #721c24;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Courier New', Courier, monospace; /* Industrieller / Retro-Look */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -27,82 +27,82 @@ body {
 
 .game-container {
     width: 100%;
-    max-width: 700px;
+    max-width: 480px;
     background-color: var(--card-bg);
-    border: 2px solid var(--border-color);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    box-shadow: 0 0 20px rgba(139, 0, 0, 0.2);
-    padding: 2rem;
+    padding: 1.5rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
 }
 
 .screen {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.2rem;
 }
 
 .hidden {
     display: none !important;
 }
 
-/* Hero Title */
-.hero-title {
-    text-align: center;
-}
-
-.hero-title h1 {
-    font-size: 2.5rem;
+/* Header & Logo */
+.title {
     color: var(--primary-color);
-    text-shadow: 0 0 10px rgba(139, 0, 0, 0.6);
-    letter-spacing: 3px;
+    font-size: 2rem;
+    letter-spacing: 2px;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(186, 12, 47, 0.5);
 }
 
 .subtitle {
     color: var(--text-muted);
+    text-align: center;
     font-size: 0.9rem;
-    letter-spacing: 2px;
+    font-style: italic;
 }
 
-/* Buttons & Inputs */
-.menu-actions, .form-actions, .dashboard-buttons {
+/* Buttons */
+.menu-buttons, .form-buttons, .dashboard-buttons {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.8rem;
 }
 
 .btn {
-    padding: 0.8rem 1.2rem;
-    border: 1px solid var(--border-color);
-    background-color: #1a1a22;
-    color: var(--text-color);
-    font-size: 1rem;
+    padding: 0.8rem 1rem;
+    border: none;
+    border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s ease;
-    border-radius: 4px;
+    transition: background 0.2s, transform 0.1s;
 }
 
-.btn:hover:not(:disabled) {
-    background-color: var(--border-color);
-    color: #fff;
+.btn:active {
+    transform: scale(0.98);
 }
 
 .btn.primary {
     background-color: var(--primary-color);
-    border-color: var(--primary-color);
+    color: #fff;
 }
 
 .btn.primary:hover {
     background-color: var(--primary-hover);
 }
 
-.btn.danger {
-    border-color: #5a1111;
-    color: #ff6666;
+.btn.secondary {
+    background-color: #2a2a36;
+    color: var(--text-color);
 }
 
-.btn.danger:hover {
-    background-color: #5a1111;
+.btn.secondary:hover {
+    background-color: #3b3b4d;
+}
+
+.btn.danger {
+    background-color: var(--danger-color);
+    color: #fff;
 }
 
 .btn:disabled {
@@ -110,26 +110,25 @@ body {
     cursor: not-allowed;
 }
 
-/* Forms */
+/* Formulare */
 .form-group {
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
 }
 
 input, select {
-    padding: 0.7rem;
-    background-color: #0e0e12;
+    padding: 0.6rem;
+    background-color: #0d0d11;
     border: 1px solid var(--border-color);
     color: var(--text-color);
     border-radius: 4px;
-    font-size: 1rem;
 }
 
 input:focus, select:focus {
@@ -137,29 +136,21 @@ input:focus, select:focus {
     border-color: var(--primary-color);
 }
 
-/* Save Info & HUD */
-.save-info-text {
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
+/* HUD & Status */
 .hud {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    gap: 0.5rem;
+    background: #08080a;
+    padding: 0.6rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    font-size: 0.8rem;
 }
 
 .hud-item {
-    font-size: 0.85rem;
-    background: #0e0e12;
-    padding: 0.4rem 0.8rem;
-    border-radius: 4px;
+    color: var(--text-color);
 }
-/* --- WOCHEN-PLANNER & DASHBOARD ERWEITERUNGEN --- */
+
 .status-bar {
     background: #0e0e12;
     padding: 0.6rem;
@@ -174,6 +165,7 @@ input:focus, select:focus {
     margin-bottom: 1rem;
 }
 
+/* Wochenplanung */
 .week-planner {
     display: flex;
     flex-direction: column;
@@ -198,6 +190,51 @@ input:focus, select:focus {
     width: 100%;
 }
 
+/* Gig Mailbox */
+.gig-mailbox {
+    background: #101014;
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+}
+
+.gig-mailbox h4 {
+    color: var(--primary-color);
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.gig-card {
+    background: #08080a;
+    border: 1px solid var(--border-color);
+    padding: 0.8rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.gig-info h5 {
+    color: #fff;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+.gig-info p {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.no-gigs {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Event Log */
 .event-log {
     background: #08080a;
     border: 1px solid var(--border-color);
@@ -237,49 +274,14 @@ input:focus, select:focus {
 .sub-buttons .btn {
     flex: 1;
 }
-/* --- GIG MAILBOX STYLES --- */
-.gig-mailbox {
-    background: #101014;
-    border: 1px solid var(--border-color);
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-}
 
-.gig-mailbox h4 {
-    color: var(--primary-color);
-    margin-bottom: 0.8rem;
-    font-size: 0.95rem;
-}
-
-.gig-card {
-    background: #08080a;
-    border: 1px solid var(--border-color);
-    padding: 0.8rem;
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.gig-info h5 {
-    color: #fff;
-    font-size: 0.9rem;
-    margin-bottom: 0.2rem;
-}
-
-.gig-info p {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.no-gigs {
+.save-status {
+    text-align: center;
     font-size: 0.8rem;
     color: var(--text-muted);
-    font-style: italic;
 }
-/* --- MODAL / POPUP STYLES --- */
+
+/* Modal / Popup */
 .modal {
     position: fixed;
     top: 0;
