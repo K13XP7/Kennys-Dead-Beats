@@ -18,13 +18,22 @@ const btnNextWeek = document.getElementById('btn-next-week');
 const saveInfoText = document.getElementById('save-info');
 const djForm = document.getElementById('dj-form');
 const logList = document.getElementById('log-list');
+const gigListContainer = document.getElementById('gig-list');
 
-// Brotjob-Gehälter Tabelle
+// Brotjob-Gehälter
 const jobSalaries = {
     "Plattenladen-Aushilfe": 120,
     "Barkeeper im Szenelokal": 160,
     "Lagerarbeiter": 220
 };
+
+// Mögliche Gig-Locations basierend auf Reputation
+const possibleGigs = [
+    { title: "Düster-Spelunke 'Der Sarg'", minRep: 0, minSkill: 5, pay: 60, repReward: 2, energyCost: 30, desc: "Kleine Kneipe, feuchter Keller. Perfekt für die ersten Gehversuche." },
+    { title: "Jugendzentrum 'Katakombe'", minRep: 5, minSkill: 12, pay: 110, repReward: 4, energyCost: 35, desc: "Szenetreff für Nachwuchs-Goths. Solide Anlage, dankbares Publikum." },
+    { title: "Untergrund-Club 'Schattenwerk'", minRep: 15, minSkill: 20, pay: 220, repReward: 7, energyCost: 45, desc: "Bekannter Szene-Club. Hier schauen auch auswärtige DJs vorbei." },
+    { title: "Industrial Festival 'Maschinensturm'", minRep: 35, minSkill: 35, pay: 450, repReward: 15, energyCost: 60, desc: "Große Halle, harte Bässe. Dein erster großer Festival-Slot!" }
+];
 
 // --- INITIALISIERUNG ---
 window.addEventListener('DOMContentLoaded', () => {
@@ -54,7 +63,7 @@ function saveGame() {
     if (!gameState) return;
     localStorage.setItem('graveyard_noise_save', JSON.stringify(gameState));
     addLog("💾 Spielstand gespeichert.");
-    alert('Spielstand erfolgreich gespeichert! ⚰️️');
+    alert('Spielstand erfolgreich gespeichert! ⚰️');
     checkExistingSave();
 }
 
@@ -62,9 +71,9 @@ function loadGame() {
     const savedData = localStorage.getItem('graveyard_noise_save');
     if (savedData) {
         gameState = JSON.parse(savedData);
-        // Falls alter Speicherstand geladen wird, Standardwerte setzen:
         if (!gameState.week) gameState.week = 1;
         if (!gameState.energy) gameState.energy = 100;
+        if (!gameState.currentGigs) gameState.currentGigs = [];
         if (!gameState.logs) gameState.logs = ["Spielstand geladen."];
         
         updateDashboard();
@@ -97,12 +106,60 @@ djForm.addEventListener('submit', (e) => {
         reputation: 5,
         skill: 10,
         week: 1,
+        currentGigs: [],
         logs: ["Karriere gestartet in der Region: " + document.getElementById('dj-region').value]
     };
 
+    generateGigOffers();
     updateDashboard();
     showScreen('dashboard');
 });
+
+// --- GIG-GENERATOR ---
+function generateGigOffers() {
+    gameState.currentGigs = [];
+    // Chance auf Gig-Anfrage basierend auf Reputation
+    possibleGigs.forEach(gig => {
+        if (gameState.reputation >= gig.minRep && Math.random() > 0.4) {
+            gameState.currentGigs.push(gig);
+        }
+    });
+}
+
+function playGig(gigIndex) {
+    const gig = gameState.currentGigs[gigIndex];
+
+    if (gameState.energy < gig.energyCost) {
+        alert("Du bist zu erschöpft für diesen Gig! Rufe dich erst aus.");
+        return;
+    }
+
+    // Erfolgswahrscheinlichkeit basierend auf Skill
+    const successRate = Math.min(100, (gameState.skill / gig.minSkill) * 80);
+    const roll = Math.random() * 100;
+
+    gameState.energy -= gig.energyCost;
+
+    if (roll <= successRate) {
+        // Erfolgreicher Gig
+        const tip = Math.floor(Math.random() * 20) + 10;
+        const totalEarnings = gig.pay + tip;
+        gameState.money += totalEarnings;
+        gameState.reputation += gig.repReward;
+        gameState.skill += 2;
+        addLog(`🦇 GIG ERFOLG in '${gig.title}'! Gage: ${gig.pay}€ + ${tip}€ Trinkgeld. Rep: +${gig.repReward}`);
+    } else {
+        // Desaster-Gig (Übergänge verpatzt etc.)
+        const halfPay = Math.floor(gig.pay / 2);
+        gameState.money += halfPay;
+        gameState.reputation = Math.max(0, gameState.reputation - 1);
+        addLog(`💀 GIG PANNENSHOW in '${gig.title}'... Set verpatzt. Nur ${halfPay}€ Gage bekommen. Rep: -1`);
+    }
+
+    // Gig aus der Liste entfernen
+    gameState.currentGigs.splice(gigIndex, 1);
+    updateDashboard();
+}
 
 // --- WOCHEN-SIMULATION (LOGIK) ---
 btnNextWeek.addEventListener('click', () => {
@@ -110,59 +167,61 @@ btnNextWeek.addEventListener('click', () => {
     const weekendAction = document.getElementById('select-weekend').value;
 
     gameState.week++;
-    gameState.logs = []; // Log für neue Woche zurücksetzen
+    gameState.logs = [];
 
-    // 1. Unter der Woche Aktion
+    // 1. Unter der Woche
     if (weekdayAction === 'work') {
         const salary = jobSalaries[gameState.job] || 100;
         gameState.money += salary;
         gameState.energy -= 40;
-        addLog(`💼 Im Brotjob gearbeitet: +${salary} € | -40% Energie`);
+        addLog(`💼 Brotjob: +${salary} € | -40% Energie`);
     } else if (weekdayAction === 'digging') {
         if (gameState.money >= 50) {
             gameState.money -= 50;
             gameState.skill += 3;
             gameState.energy -= 20;
-            addLog(`🎧 Platten gediggt: -50 €, DJ-Skill steigt (+3) | -20% Energie`);
+            addLog(`🎧 Platten gediggt: -50 €, DJ-Skill +3 | -20% Energie`);
         } else {
-            addLog(`⚠️ Zu wenig Geld zum Platten-Diggen! Woche verbracht ohne Käufe.`);
+            addLog(`⚠️ Zu wenig Geld zum Platten-Diggen!`);
         }
     } else if (weekdayAction === 'rest') {
         gameState.energy = Math.min(100, gameState.energy + 40);
-        addLog(`🛋️ Unter der Woche ausgeruht: +40% Energie`);
+        addLog(`🛋️ Unter der Woche erholt: +40% Energie`);
     }
 
-    // 2. Wochenende Aktion
+    // 2. Wochenende
     if (weekendAction === 'club') {
         if (gameState.money >= 30) {
             gameState.money -= 30;
             gameState.reputation += 2;
             gameState.energy -= 30;
-            addLog(`🦇 Im Szene-Club netzwerkt: -30 €, Reputation steigt (+2) | -30% Energie`);
+            addLog(`🦇 Szene-Club Netzwerken: -30 €, Reputation +2 | -30% Energie`);
         } else {
-            addLog(`⚠️ Nicht genug Geld für den Club-Eintritt/Drinks!`);
+            addLog(`⚠️ Kein Geld für den Club-Eintritt!`);
         }
     } else if (weekendAction === 'practice') {
         gameState.skill += 2;
         gameState.energy -= 20;
-        addLog(`🎹 Setlisten geübt: DJ-Skill steigt (+2) | -20% Energie`);
+        addLog(`🎹 Setlisten geübt: DJ-Skill +2 | -20% Energie`);
     } else if (weekendAction === 'sleep') {
         gameState.energy = Math.min(100, gameState.energy + 50);
         addLog(`😴 Wochenende ausgeschlafen: +50% Energie`);
     }
 
-    // 3. Fixkosten / Miete (Wöchentlich)
+    // 3. Miete
     const rent = gameState.region === 'Metropole' ? 80 : 45;
     gameState.money -= rent;
-    addLog(`🏚️ Wöchentliche Fixkosten/Miete bezahlt: -${rent} €`);
+    addLog(`🏚️️ Miete bezahlt: -${rent} €`);
 
     // Burnout Check
     if (gameState.energy <= 0) {
         gameState.energy = 30;
         gameState.money -= 40;
-        addLog(`💀 BURNOUT! Du warst völlig erschöpft. Arztrechnung: -40 €`);
+        addLog(`💀 BURNOUT! Notfall-Rast nötig. Arztrechnung: -40 €`);
     }
 
+    // Neue Gigs für die nächste Woche generieren
+    generateGigOffers();
     updateDashboard();
 });
 
@@ -180,11 +239,31 @@ function updateDashboard() {
     document.getElementById('hud-energy').textContent = gameState.energy;
     document.getElementById('hud-rep').textContent = gameState.reputation;
 
-    // Log-Fenster aktualisieren
+    // Log-Fenster
     logList.innerHTML = '';
     gameState.logs.forEach(log => {
         const li = document.createElement('li');
         li.textContent = log;
         logList.appendChild(li);
     });
+
+    // Gig-Anfragen darstellen
+    gigListContainer.innerHTML = '';
+    if (!gameState.currentGigs || gameState.currentGigs.length === 0) {
+        gigListContainer.innerHTML = '<p class="no-gigs">Keine aktuellen Anfragen diese Woche.</p>';
+    } else {
+        gameState.currentGigs.forEach((gig, index) => {
+            const card = document.createElement('div');
+            card.className = 'gig-card';
+            card.innerHTML = `
+                <div class="gig-info">
+                    <h5>${gig.title}</h5>
+                    <p>${gig.desc}</p>
+                    <p><strong>Gage:</strong> ${gig.pay}€ | <strong>Energie:</strong> -${gig.energyCost}% | <strong>Empf. Skill:</strong> ${gig.minSkill}</p>
+                </div>
+                <button class="btn primary" onclick="playGig(${index})">Gig Spielen 🎧</button>
+            `;
+            gigListContainer.appendChild(card);
+        });
+    }
 }
