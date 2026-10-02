@@ -18,7 +18,7 @@
             </div>
 
             <div class="menu-buttons">
-                <button id="btn-new-game" class="btn primary">⚰️ Neues Spiel</button>
+                <button id="btn-new-game" class="btn primary">⚰️️ Neues Spiel</button>
                 <button id="btn-continue" class="btn secondary" disabled>💾 Spiel fortsetzen</button>
             </div>
 
@@ -74,10 +74,10 @@
         <section id="dashboard-screen" class="screen hidden">
             <header class="hud">
                 <div class="hud-item"><strong id="hud-name">DJ Name</strong></div>
-                <div class="hud-item">KW <span id="hud-week">1</span></div>
+                <div class="hud-item">KW <span id="hud-week">1</span> | <span id="hud-day" class="day-highlight">Montag</span></div>
                 <div class="hud-item">Geld: <span id="hud-money">0</span> €</div>
                 <div class="hud-item">Energie: <span id="hud-energy">100</span>%</div>
-                <div class="hud-item">Reputation: <span id="hud-rep">0</span></div>
+                <div class="hud-item">Rep: <span id="hud-rep">0</span> | Skill: <span id="hud-skill">0</span></div>
             </header>
 
             <main class="dashboard-content">
@@ -85,32 +85,40 @@
                     <p><strong>Brotjob:</strong> <span id="hud-job">-</span> | <strong>Region:</strong> <span id="hud-region">-</span></p>
                 </div>
 
-                <h3>Wochenplanung</h3>
-                <p class="instruction">Wähle deine Aktivitäten für die aktuelle Woche:</p>
+                <h3>Tagesplanung</h3>
+                <p class="instruction">Was möchtest du heute (<span id="current-day-label">Montag</span>) tun?</p>
 
-                <div class="week-planner">
-                    <div class="plan-card">
-                        <h4>💼 Unter der Woche (Mo–Fr)</h4>
-                        <select id="select-weekday">
-                            <option value="work">Arbeiten im Brotjob (+Gehalt, -40% Energie)</option>
-                            <option value="digging">Platten diggen & Musik ordnen (-50 €, +Skill, -20% Energie)</option>
-                            <option value="rest">Entspannen & Kraft tanken (+40% Energie)</option>
-                        </select>
-                    </div>
+                <!-- TAGES-AKTIONEN -->
+                <div class="daily-actions">
+                    <button class="btn action-btn" onclick="performDailyAction('work')">
+                        💼 <strong>In Brotjob arbeiten</strong>
+                        <span>+Einkommen | -30% Energie</span>
+                    </button>
 
-                    <div class="plan-card">
-                        <h4>🦇 Wochenende (Sa–So)</h4>
-                        <select id="select-weekend">
-                            <option value="club">In Szene-Clubs networken (-30 €, +2 Rep, -30% Energie)</option>
-                            <option value="practice">Setlisten vorbereiten / Üben (+Skill, -20% Energie)</option>
-                            <option value="sleep">Ausschlafen & Erholen (+50% Energie)</option>
-                        </select>
-                    </div>
+                    <button class="btn action-btn" onclick="performDailyAction('practice')">
+                        🎹 <strong>Setlisten üben & Feilen</strong>
+                        <span>+2 Skill | -15% Energie</span>
+                    </button>
+
+                    <button class="btn action-btn" onclick="performDailyAction('digging')">
+                        🎧 <strong>Platten diggen & kaufen</strong>
+                        <span>-40 € | +4 Skill | -10% Energie</span>
+                    </button>
+
+                    <button class="btn action-btn" onclick="performDailyAction('club')">
+                        🦇 <strong>In Szene-Clubs networken</strong>
+                        <span>-25 € | +2 Rep | -25% Energie</span>
+                    </button>
+
+                    <button class="btn action-btn sleep-btn" onclick="performDailyAction('rest')">
+                        😴 <strong>Schlafen & Ausruhen</strong>
+                        <span>+40% Energie</span>
+                    </button>
                 </div>
 
                 <!-- ANFRAGEN & GIGS -->
                 <div class="gig-mailbox">
-                    <h4>📥 Eingehende Gig-Anfragen:</h4>
+                    <h4>📥 Gigs am Wochenende (Sa/So verplant):</h4>
                     <div id="gig-list">
                         <p class="no-gigs">Keine aktuellen Anfragen diese Woche.</p>
                     </div>
@@ -118,14 +126,13 @@
 
                 <!-- Log-Bereich für Ereignisse -->
                 <div class="event-log">
-                    <h4>⚰️ Chronik der Woche:</h4>
+                    <h4>⚰️ Tages-Chronik:</h4>
                     <ul id="log-list">
                         <li>Deine Karriere hat begonnen...</li>
                     </ul>
                 </div>
 
                 <div class="dashboard-buttons">
-                    <button id="btn-next-week" class="btn primary">⏳ Woche simulieren & beenden</button>
                     <div class="sub-buttons">
                         <button id="btn-save" class="btn secondary">💾 Speichern</button>
                         <button id="btn-quit" class="btn danger">🚪 Hauptmenü</button>
@@ -155,7 +162,7 @@
                 <div class="finance-row total"><span>= Bilanz:</span> <span><span id="summary-balance">0</span> €</span></div>
             </div>
 
-            <button id="btn-close-summary" class="btn primary" style="width: 100%; margin-top: 1rem;">Weiter zur nächsten Woche 🦇</button>
+            <button id="btn-close-summary" class="btn primary" style="width: 100%; margin-top: 1rem;">Nächste Woche starten 🦇</button>
         </div>
     </div>
 
