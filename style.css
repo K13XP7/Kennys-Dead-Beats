@@ -24,7 +24,7 @@ html, body {
     height: 100vh;
     background-color: var(--bg-black);
     color: var(--text-main);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,7 +38,7 @@ html, body {
     max-width: 98vw;
     max-height: 98vh;
     
-    /* Notfall-Farbe falls das Bild noch lädt */
+    /* Notfall-Hintergrund falls das Bild noch lädt */
     background-color: #121218; 
     
     /* Hintergrundbild Einbindung */
@@ -50,7 +50,9 @@ html, body {
     position: relative;
     border: 2px solid var(--panel-border);
     box-shadow: 0 0 35px rgba(0, 0, 0, 0.95);
+    
     image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
 
 /* 3. SEITLICHE RACK-PANELS */
