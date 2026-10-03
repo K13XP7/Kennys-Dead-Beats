@@ -3,82 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRAVEYARD NOISE - Goth DJ & Promoter Simulator</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>Kennys Dead Beats - Goth DJ Simulator</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="game-screen">
         
-        <!-- LINKES RACK (AVATAR & STATS) -->
-        <div class="side-rack left-rack">
+        <!-- LINKES RACK (STEUERUNG & STATS) -->
+        <aside class="side-rack left-rack">
             <div class="avatar-box">
-                <img src="assets/images/avatars/female_1.png" alt="DJ Avatar" id="current-avatar">
+                <img id="current-avatar" src="" alt="DJ Avatar">
             </div>
+
             <div class="stat-group">
                 <div class="stat-label">DJ NAME</div>
                 <div class="stat-value highlight" id="name-display">---</div>
             </div>
+
             <div class="stat-group">
                 <div class="stat-label">DATUM</div>
                 <div class="stat-value" id="date-display">02. OKT 2026</div>
             </div>
+
             <div class="stat-group">
                 <div class="stat-label">BARGELD (€)</div>
                 <div class="stat-value cash" id="cash-display">300</div>
             </div>
+
             <div class="stat-group">
                 <div class="stat-label">REPUTATION</div>
                 <div class="stat-value rep" id="rep-display">0</div>
             </div>
+
             <div class="stat-group">
                 <div class="stat-label">SKILL (0-100)</div>
                 <div class="stat-value" id="skill-display">10</div>
             </div>
-        </div>
+        </aside>
 
-        <!-- RECHTES RACK (ENERGIE & TERMINE) -->
-        <div class="side-rack right-rack">
-            <div class="stat-group energy-group">
-                <div class="stat-label">ENERGIE <span id="energy-text">100%</span></div>
-                <div class="energy-bar-container">
-                    <div class="energy-bar-fill" id="energy-fill" style="width: 100%;"></div>
-                </div>
-            </div>
-            <div class="stat-group">
-                <div class="stat-label">HAUPT-GENRE</div>
-                <div class="stat-value genre-tag" id="main-genre-display">---</div>
-            </div>
-            <div class="panel termin-panel">
-                <div class="panel-title">📅 TERMINE</div>
-                <ul class="event-list" id="event-calendar">
-                    <li class="event-item muted">Keine anstehenden Gigs</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- ZENTRALER VIEWPORT (HAUPTBILDSCHIRM) -->
-        <div class="viewport-content" id="main-viewport">
+        <!-- ZENTRALER MONITOR / VIEWPORT -->
+        <main class="viewport-content">
             
-            <!-- SCREEN 1: ANMELDEBILDSCHIRM / CHARAKTERERSTELLUNG -->
-            <div id="screen-setup" class="view-screen active">
+            <!-- SCREEN 1: CHARAKTERERSTELLUNG -->
+            <section id="screen-setup" class="view-screen active">
                 <div class="panel-title">💀 CHARAKTERERSTELLUNG</div>
                 
                 <div class="form-group">
                     <label for="dj-name">DJ-Name:</label>
                     <input type="text" id="dj-name" class="input-text" placeholder="z. B. DJ Rotter" value="DJ Rotter">
-                </div>
-
-                <div class="form-group">
-                    <label for="start-region">Start-Region / Stadt:</label>
-                    <select id="start-region" class="select-box">
-                        <option value="Berlin">Berlin (Goth / Wave Hochburg)</option>
-                        <option value="Leipzig">Leipzig (Gotik-Szene Zentrum)</option>
-                        <option value="Ruhrgebiet">Ruhrgebiet (EBM & Industrial)</option>
-                        <option value="Hamburg">Hamburg (Post-Punk Underground)</option>
-                        <option value="Wien">Wien (Dark Disco & Coldwave)</option>
-                    </select>
                 </div>
 
                 <div class="form-group">
@@ -92,95 +68,70 @@
                 </div>
 
                 <button class="btn btn-main" onclick="finishCharacterSetup()">KARRIERE STARTEN</button>
-            </div>
+            </section>
 
-            <!-- SCREEN 2: DASHBOARD / TAGESPLANUNG -->
-            <div id="screen-dashboard" class="view-screen">
-                <div class="panel-title">🎛 TAGES-PLANUNG</div>
+            <!-- SCREEN 2: DASHBOARD / HAUPTMENÜ -->
+            <section id="screen-dashboard" class="view-screen">
+                <div class="panel-title">🎛️ HAUPTMENÜ & ZENTRALE</div>
                 
-                <label for="action-select">Aktion wählen (Tages-Schleife):</label>
-                <select id="action-select" class="select-box">
-                    <option value="rest">🛋️ Erholen & Schlafen (+40% E)</option>
-                    <option value="dig">💿 Platten diggen (-50 €, -10% E, +Skill & Tracks)</option>
-                    <option value="rehearse">🎧 Set üben (-15% E, +2 Skill)</option>
-                    <option value="network">🎪 Szene-Clubs networken (-30% E, Gig-Anfragen)</option>
-                </select>
-
+                <p class="hint-text">Willkommen im Untergrund. Nutze deine Zeit, um dein Set aufzubauen, dich zu erholen oder Auftritte anzunehmen.</p>
+                
                 <div class="booster-box">
-                    <span class="drink-label">🥤 Energy Drink (10 €, +5% E)</span>
-                    <button class="btn btn-small" onclick="buyEnergyDrink()">DOSE KAUFEN</button>
-                    <span class="drink-dots" id="drink-tracker">[ ][ ][ ][ ][ ]</span>
+                    <span>☕ Energy-Drink trinken (+25 Energie, -15 €)</span>
+                    <button class="btn btn-small" onclick="buyEnergyDrink()">KAUFEN</button>
                 </div>
-
-                <button class="btn btn-main" onclick="simulateNextDay()">>>> NÄCHSTEN TAG SIMULIEREN</button>
 
                 <div class="nav-buttons-grid">
-                    <button class="btn btn-nav" onclick="switchScreen('screen-setlist')">🎼 25-SLOT SETLIST EDITOR</button>
-                    <button class="btn btn-nav" onclick="switchScreen('screen-promoter')" id="btn-promoter" disabled>🎪 PARTY-PLANNER (Ab REP 30)</button>
+                    <button class="btn btn-nav" onclick="switchScreen('screen-setlist')">🎵 SETLIST EDITIEREN</button>
+                    <button class="btn btn-nav" onclick="nextDay()">🌙 NÄCHSTER TAG (+10 ENERGIE)</button>
                 </div>
-            </div>
+            </section>
 
-            <!-- SCREEN 3: 25-SLOT SETLIST EDITOR -->
-            <div id="screen-setlist" class="view-screen">
-                <div class="panel-title">🎼 SETLIST EDITOR (25 SLOTS)</div>
-                <p class="hint-text">Beweise Gefühl für den Verlauf: Warmup, Peaktime & Outro.</p>
-                
+            <!-- SCREEN 3: SETLIST EDITOR -->
+            <section id="screen-setlist" class="view-screen">
+                <div class="panel-title">🎧 SETLIST EDITOR</div>
+                <p class="hint-text">Stelle deine Tracks für die kommenden Gigs zusammen:</p>
+
                 <div class="setlist-container">
-                    <div class="setlist-slots" id="setlist-slots-grid"></div>
+                    <div id="setlist-slots" class="setlist-slots"></div>
                 </div>
 
                 <div class="setlist-actions">
-                    <button class="btn btn-small" onclick="autoFillSetlist()">⚡ AUTO-FILL (SCHNELL)</button>
+                    <button class="btn btn-small" onclick="switchScreen('screen-dashboard')">⬅ ZURÜCK ZUM DASHBOARD</button>
+                </div>
+            </section>
 
-                    <button class="btn btn-small" onclick="clearSetlist()">🗑️ LEEREN</button>
-                    <button class="btn btn-main" onclick="switchScreen('screen-dashboard')">SPEICHERN & ZURÜCK</button>
+        </main>
+
+        <!-- RECHTES RACK (STATUS & TERMINE) -->
+        <aside class="side-rack right-rack">
+            <div class="stat-group">
+                <div class="stat-label">ENERGIE <span id="energy-text">100%</span></div>
+                <div class="energy-bar-container">
+                    <div class="energy-bar-fill" id="energy-bar" style="width: 100%;"></div>
                 </div>
             </div>
 
-            <!-- SCREEN 4: EVENT PROMOTER / PARTY-PLANNER -->
-            <div id="screen-promoter" class="view-screen">
-                <div class="panel-title">🎪 EIGENES EVENT ORGANISIEREN</div>
-                
-                <div class="form-group">
-                    <label for="event-location">Location mieten:</label>
-                    <select id="event-location" class="select-box" onchange="updateEventCosts()">
-                        <option value="300|100">Jugendzentrum (Miete: 300 €, Kapazität: 100)</option>
-                        <option value="800|300">Underground Club (Miete: 800 €, Kapazität: 300)</option>
-                        <option value="2000|800">Alte Fabrikhalle (Miete: 2.000 €, Kapazität: 800)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Line-Up Besetzung (1 bis 5 Slots):</label>
-                    <div id="lineup-slots-container" class="lineup-container"></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="promo-budget">Marketing-Budget (€):</label>
-                    <input type="number" id="promo-budget" class="input-text" value="100" min="0" step="50" onchange="updateEventCosts()">
-                </div>
-
-                <div class="cost-summary">
-                    <span>Gesamtkosten Event: <strong id="event-total-cost" class="cash">400 €</strong></span>
-                </div>
-
-                <button class="btn btn-main" onclick="hostEvent()">EVENT VERANSTALTEN & Buchen</button>
-                <button class="btn btn-small" onclick="switchScreen('screen-dashboard')">ZURÜCK ZUM DASHBOARD</button>
+            <div class="stat-group">
+                <div class="stat-label">HAUPT-GENRE</div>
+                <div class="stat-value genre-tag" id="main-genre-display">---</div>
             </div>
 
-        </div>
-
-        <!-- UNTERE KONSOLE (CHRONIK & TRACK) -->
-        <div class="bottom-console">
-            <div class="now-playing">
-                <span class="track-label">AKTUELLE SZENE-MELDUNG:</span>
-                <span class="track-title" id="now-playing-title">Willkommen in der Düsterszene.</span>
+            <div class="stat-group">
+                <div class="stat-label">📅 TERMINE</div>
+                <p class="hint-text" id="gigs-display" style="margin-top: 4px;">Keine anstehenden Gigs</p>
             </div>
+        </aside>
+
+        <!-- UNTERE KONSOLE (CHRONIK & MELDUNGEN) -->
+        <footer class="bottom-console">
+            <div class="now-playing" id="scene-news">AKTUELLE SZENE-MELDUNG: Willkommen in der Düsterszene.</div>
             <div class="log-panel">
-                <div class="panel-title">📜 CHRONIK</div>
-                <div class="log-entries" id="log-entries"></div>
+                <div class="log-entries" id="log-entries">
+                    <div class="log-entry">📜 <span class="date">[02. OKT 2026]</span> Chronik gestartet.</div>
+                </div>
             </div>
-        </div>
+        </footer>
 
     </div>
 
