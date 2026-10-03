@@ -64,7 +64,7 @@ html, body {
     flex-direction: column;
     gap: 8px;
     padding: 6px;
-    background-color: rgba(10, 10, 14, 0.7);
+    background-color: rgba(10, 10, 14, 0.75);
     border: 1px solid rgba(42, 42, 54, 0.6);
 }
 
@@ -179,7 +179,7 @@ html, body {
 }
 
 .avatar-option span { display: block; font-size: 0.55rem; color: var(--text-muted); padding: 2px 0; }
-.avatar-option.selected { border-color: var(--accent-cyan); background-color: rgba(0,243,255,0.1); }
+.avatar-option.selected { border-color: var(--accent-cyan); background-color: rgba(0, 243, 255, 0.1); }
 
 /* BOOSTER & BUTTONS */
 .booster-box {
@@ -233,7 +233,7 @@ html, body {
     height: 22%;
     display: flex;
     flex-direction: column;
-    background-color: rgba(10, 10, 14, 0.8);
+    background-color: rgba(10, 10, 14, 0.85);
     border: 1px solid rgba(42, 42, 54, 0.6);
 }
 
@@ -241,5 +241,3 @@ html, body {
 .log-panel { flex-grow: 1; overflow: hidden; padding: 6px 8px; }
 .log-entries { display: flex; flex-direction: column-reverse; gap: 3px; font-size: 0.7rem; height: 100%; overflow-y: auto; }
 .log-entry span.date { color: var(--text-muted); }
-.event-list { list-style: none; font-size: 0.65rem; }
-.event-item.muted { color: var(--text-muted); }
