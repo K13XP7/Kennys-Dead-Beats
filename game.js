@@ -1,4 +1,3 @@
-// STAMMDATEN DER SUBGENRES
 const SUBGENRES_DATA = [
     { id: "trad_goth", name: "Trad-Goth" },
     { id: "darkwave", name: "Darkwave" },
@@ -12,7 +11,6 @@ const SUBGENRES_DATA = [
     { id: "new_wave", name: "New-Wave" }
 ];
 
-// STAMMDATEN DER AVATARE (5x Frau, 5x Mann)
 const AVATARS_DATA = [
     { id: "trad_goth_f", label: "Trad-Goth F", src: "assets/images/avatars/trad_goth_f.png" },
     { id: "darkwave_f", label: "Darkwave F", src: "assets/images/avatars/darkwave_f.png" },
@@ -26,7 +24,6 @@ const AVATARS_DATA = [
     { id: "new_wave_m", label: "New-Wave M", src: "assets/images/avatars/new_wave_m.png" }
 ];
 
-// GAME STATE (FEHLERBEHOBEN: 25 Setlist-Slots)
 let gameState = {
     setupComplete: false,
     djName: "",
@@ -39,10 +36,9 @@ let gameState = {
     rep: 0,
     skill: 10,
     energy: 100,
-    setlist: new Array(25).fill("post_punk") // Korrigiert auf 25 Slots
+    setlist: new Array(25).fill("post_punk")
 };
 
-// INITIALISIERUNG
 document.addEventListener("DOMContentLoaded", () => {
     initSubgenreDropdown();
     initAvatarPicker();
@@ -76,11 +72,7 @@ function initAvatarPicker() {
         const img = document.createElement("img");
         img.src = avatar.src;
         img.alt = avatar.label;
-        // Fallback-Behandlung falls Bild fehlt
-        img.onerror = function() {
-            this.onerror = null;
-            this.style.opacity = "0.3";
-        };
+        img.onerror = function() { this.style.opacity = '0.2'; };
 
         const span = document.createElement("span");
         span.textContent = avatar.label;
@@ -110,10 +102,7 @@ function finishCharacterSetup() {
     gameState.avatarSrc = selectedAvatar ? selectedAvatar.dataset.src : AVATARS_DATA[0].src;
     gameState.setupComplete = true;
 
-    // UI aktualisieren
-    const avatarImg = document.getElementById("current-avatar");
-    if (avatarImg) avatarImg.src = gameState.avatarSrc;
-    
+    document.getElementById("current-avatar").src = gameState.avatarSrc;
     document.getElementById("name-display").innerText = gameState.djName;
     
     const genreObj = SUBGENRES_DATA.find(g => g.id === gameState.mainGenre);
@@ -134,7 +123,6 @@ function switchScreen(screenId) {
     }
 }
 
-// DRINK KAUFEN (FEHLERBEHOBEN: Max-Energy-Check)
 function buyEnergyDrink() {
     if (gameState.energy >= 100) {
         addLog("Du bist bereits voller Energie!");
@@ -150,10 +138,8 @@ function buyEnergyDrink() {
     updateUI();
 }
 
-// NÄCHSTER TAG (FEHLERBEHOBEN: Dynamische Monatslängen)
 function nextDay() {
     const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    
     gameState.day += 1;
     let maxDays = daysInMonth[gameState.month - 1] || 30;
     
@@ -174,7 +160,7 @@ function addLog(text) {
     const container = document.getElementById("log-entries");
     if (!container) return;
     const entry = document.createElement("div");
-    entry.className = "log-entry";
+    entry.className = "log-item";
     entry.innerHTML = `📜 <span class="date">[${getFormattedDate()}]</span> ${text}`;
     container.prepend(entry);
 }
@@ -186,7 +172,6 @@ function getFormattedDate() {
     return `${d}. ${m} ${gameState.year}`;
 }
 
-// SETLIST EDITOR (FEHLERBEHOBEN: 25 Slots & korrekter Change-Handler)
 function renderSetlistEditor() {
     const container = document.getElementById("setlist-slots");
     if (!container) return;
@@ -197,7 +182,7 @@ function renderSetlistEditor() {
         slot.className = "slot-card";
         
         const slotNum = document.createElement("div");
-        slotNum.className = "slot-num";
+        slotNum.style.color = "var(--accent-cyan)";
         slotNum.textContent = `#${i + 1}`;
 
         const select = document.createElement("select");
