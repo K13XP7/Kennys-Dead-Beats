@@ -53,7 +53,7 @@ function initSubgenreDropdown() {
     SUBGENRES_DATA.forEach(genre => {
         const opt = document.createElement("option");
         opt.value = genre.id;
-        opt.textContent = `[Wave] ${genre.name}`;
+        opt.textContent = genre.name;
         select.appendChild(opt);
     });
 }
