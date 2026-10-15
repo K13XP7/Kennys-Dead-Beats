@@ -26,7 +26,7 @@ const AVATARS_DATA = [
     { id: "new_wave_m", label: "New-Wave M", src: "assets/images/avatars/new_wave_m.png" }
 ];
 
-// GAME STATE
+// GAME STATE (FEHLERBEHOBEN: 25 Setlist-Slots)
 let gameState = {
     setupComplete: false,
     djName: "",
@@ -39,10 +39,10 @@ let gameState = {
     rep: 0,
     skill: 10,
     energy: 100,
-    setlist: new Array(10).fill("post_punk")
+    setlist: new Array(25).fill("post_punk") // Korrigiert auf 25 Slots
 };
 
-// INITIALISIERUNG BEIM LADEN DER SEITE
+// INITIALISIERUNG
 document.addEventListener("DOMContentLoaded", () => {
     initSubgenreDropdown();
     initAvatarPicker();
@@ -50,9 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUI();
 });
 
-// SUBGENRE DROPDOWN FÜLLEN
 function initSubgenreDropdown() {
     const select = document.getElementById("main-genre-select");
+    if (!select) return;
     select.innerHTML = "";
     SUBGENRES_DATA.forEach(genre => {
         const opt = document.createElement("option");
@@ -62,9 +62,9 @@ function initSubgenreDropdown() {
     });
 }
 
-// AVATAR PICKER ERSTELLEN
 function initAvatarPicker() {
     const picker = document.getElementById("avatar-picker");
+    if (!picker) return;
     picker.innerHTML = "";
 
     AVATARS_DATA.forEach((avatar, index) => {
@@ -76,8 +76,10 @@ function initAvatarPicker() {
         const img = document.createElement("img");
         img.src = avatar.src;
         img.alt = avatar.label;
+        // Fallback-Behandlung falls Bild fehlt
         img.onerror = function() {
-            this.style.display = 'none';
+            this.onerror = null;
+            this.style.opacity = "0.3";
         };
 
         const span = document.createElement("span");
@@ -89,13 +91,11 @@ function initAvatarPicker() {
     });
 }
 
-// AVATAR AUSWÄHLEN
 function selectAvatar(element) {
     document.querySelectorAll(".avatar-option").forEach(el => el.classList.remove("selected"));
     element.classList.add("selected");
 }
 
-// CHARAKTERERSTELLUNG ABSCHLIESSEN
 function finishCharacterSetup() {
     const nameInput = document.getElementById("dj-name").value.trim();
     if (!nameInput) {
@@ -111,7 +111,9 @@ function finishCharacterSetup() {
     gameState.setupComplete = true;
 
     // UI aktualisieren
-    document.getElementById("current-avatar").src = gameState.avatarSrc;
+    const avatarImg = document.getElementById("current-avatar");
+    if (avatarImg) avatarImg.src = gameState.avatarSrc;
+    
     document.getElementById("name-display").innerText = gameState.djName;
     
     const genreObj = SUBGENRES_DATA.find(g => g.id === gameState.mainGenre);
@@ -122,7 +124,6 @@ function finishCharacterSetup() {
     updateUI();
 }
 
-// SCREEN WECHSELN
 function switchScreen(screenId) {
     document.querySelectorAll(".view-screen").forEach(screen => {
         screen.classList.remove("active");
@@ -133,8 +134,12 @@ function switchScreen(screenId) {
     }
 }
 
-// DRINK KAUFEN (+ENERGIE)
+// DRINK KAUFEN (FEHLERBEHOBEN: Max-Energy-Check)
 function buyEnergyDrink() {
+    if (gameState.energy >= 100) {
+        addLog("Du bist bereits voller Energie!");
+        return;
+    }
     if (gameState.cash < 15) {
         addLog("Nicht genug Geld für einen Energy-Drink!");
         return;
@@ -145,28 +150,35 @@ function buyEnergyDrink() {
     updateUI();
 }
 
-// NÄCHSTER TAG
+// NÄCHSTER TAG (FEHLERBEHOBEN: Dynamische Monatslängen)
 function nextDay() {
+    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    
     gameState.day += 1;
-    if (gameState.day > 31) {
+    let maxDays = daysInMonth[gameState.month - 1] || 30;
+    
+    if (gameState.day > maxDays) {
         gameState.day = 1;
         gameState.month += 1;
+        if (gameState.month > 12) {
+            gameState.month = 1;
+            gameState.year += 1;
+        }
     }
     gameState.energy = Math.min(100, gameState.energy + 10);
     addLog(`Neuer Tag angebrochen: ${getFormattedDate()}`);
     updateUI();
 }
 
-// CHRONIK LOG HINZUFÜGEN
 function addLog(text) {
     const container = document.getElementById("log-entries");
+    if (!container) return;
     const entry = document.createElement("div");
     entry.className = "log-entry";
     entry.innerHTML = `📜 <span class="date">[${getFormattedDate()}]</span> ${text}`;
     container.prepend(entry);
 }
 
-// DATUM FORMATIEREN
 function getFormattedDate() {
     const months = ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"];
     const d = String(gameState.day).padStart(2, "0");
@@ -174,7 +186,7 @@ function getFormattedDate() {
     return `${d}. ${m} ${gameState.year}`;
 }
 
-// SETLIST EDITOR RENDERN
+// SETLIST EDITOR (FEHLERBEHOBEN: 25 Slots & korrekter Change-Handler)
 function renderSetlistEditor() {
     const container = document.getElementById("setlist-slots");
     if (!container) return;
@@ -207,7 +219,6 @@ function renderSetlistEditor() {
     }
 }
 
-// UI AKTUALISIEREN
 function updateUI() {
     document.getElementById("date-display").innerText = getFormattedDate();
     document.getElementById("cash-display").innerText = gameState.cash;
