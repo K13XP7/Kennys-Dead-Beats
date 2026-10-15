@@ -29,7 +29,7 @@
                 <div class="panel-header">DJ PROFILE</div>
                 
                 <div class="avatar-box">
-                    <img id="current-avatar" src="" alt="Avatar" onerror="this.style.opacity='0.2'">
+                    <canvas id="profile-canvas-fallback" width="64" height="64"></canvas>
                 </div>
 
                 <div class="stat-item">
@@ -56,9 +56,9 @@
             <!-- ZENTRALER BILDSCHIRM (HAUPT-VIEWPORT) -->
             <main class="center-viewport">
                 
-                <!-- SCREEN 1: CHARAKTERERSTELLUNG -->
+                <!-- SCREEN 1: CHARAKTERERSTELLUNG & 8-BIT BAUKASTEN (STARTSEITE) -->
                 <section id="screen-setup" class="view-screen active">
-                    <h2 class="screen-title">✦ CHARAKTERERSTELLUNG ✦</h2>
+                    <h2 class="screen-title">✦ CHARAKTERERSTELLUNG & AVATAR ✦</h2>
                     
                     <div class="form-group">
                         <label for="dj-name">DJ-Name:</label>
@@ -70,56 +70,14 @@
                         <select id="main-genre-select" class="input-field"></select>
                     </div>
 
-                    <div class="form-group">
-                        <label>Wähle deinen Start-Avatar:</label>
-                        <div class="avatar-grid" id="avatar-picker"></div>
-                    </div>
-
-                    <button class="btn btn-primary" onclick="finishCharacterSetup()">KARRIERE STARTEN</button>
-                </section>
-
-                <!-- SCREEN 2: DASHBOARD -->
-                <section id="screen-dashboard" class="view-screen">
-                    <h2 class="screen-title">✦ ZENTRALE / DASHBOARD ✦</h2>
-                    <p class="description">Willkommen im Untergrund. Plane deine nächsten Schritte:</p>
-                    
-                    <div class="action-card">
-                        <div class="action-info">
-                            <strong>Energy-Drink trinken</strong>
-                            <small>+25 Energie | Kosten: 15 €</small>
-                        </div>
-                        <button class="btn btn-small" onclick="buyEnergyDrink()">KAUFEN</button>
-                    </div>
-
-                    <div class="dashboard-grid">
-                        <button class="btn btn-nav" onclick="switchScreen('screen-setlist')">🎵 SETLIST EDITIEREN</button>
-                        <button class="btn btn-nav" onclick="switchScreen('screen-avatar-editor')">🎨 AVATAR-BAUKASTEN</button>
-                        <button class="btn btn-nav" onclick="nextDay()">🌙 NÄCHSTER TAG</button>
-                    </div>
-                </section>
-
-                <!-- SCREEN 3: SETLIST EDITOR -->
-                <section id="screen-setlist" class="view-screen">
-                    <h2 class="screen-title">✦ SETLIST EDITOR (25 TRACKS) ✦</h2>
-                    <p class="description">Stelle deine 25 Tracks für bevorstehende Gigs zusammen:</p>
-
-                    <div class="setlist-scroll-area">
-                        <div id="setlist-slots" class="setlist-grid"></div>
-                    </div>
-
-                    <button class="btn btn-secondary" onclick="switchScreen('screen-dashboard')">⬅ ZURÜCK ZUM DASHBOARD</button>
-                </section>
-
-                <!-- SCREEN 4: AVATAR-BAUKASTEN EDITOR -->
-                <section id="screen-avatar-editor" class="view-screen">
-                    <h2 class="screen-title">✦ 8-BIT AVATAR EDITOR ✦</h2>
-                    
                     <div class="editor-layout">
+                        <!-- LINKS: LIVE-CANVAS-PREVIEW -->
                         <div class="preview-area">
                             <canvas id="avatar-canvas" width="64" height="64"></canvas>
-                            <span class="preview-label">LIVE-VORSCHAU (64x64)</span>
+                            <span class="preview-label">LIVE-VORSCHAU</span>
                         </div>
 
+                        <!-- RECHTS: BAUKASTEN-EINSTELLUNGEN -->
                         <div class="controls-area">
                             <div class="form-group">
                                 <label>Hautton / Teint:</label>
@@ -173,10 +131,39 @@
                         </div>
                     </div>
 
-                    <div class="editor-buttons">
-                        <button class="btn btn-primary" onclick="saveCustomAvatar()">AVATAR SPEICHERN & ÜBERNEHMEN</button>
-                        <button class="btn btn-secondary" onclick="switchScreen('screen-dashboard')">⬅ ZURÜCK ZUM DASHBOARD</button>
+                    <button class="btn btn-primary" onclick="finishCharacterSetup()">KARRIERE STARTEN & AVATAR SPEICHERN</button>
+                </section>
+
+                <!-- SCREEN 2: DASHBOARD (HAUPTMENÜ) -->
+                <section id="screen-dashboard" class="view-screen">
+                    <h2 class="screen-title">✦ ZENTRALE / DASHBOARD ✦</h2>
+                    <p class="description">Willkommen im Untergrund. Plane deine nächsten Schritte:</p>
+                    
+                    <div class="action-card">
+                        <div class="action-info">
+                            <strong>Energy-Drink trinken</strong>
+                            <small>+25 Energie | Kosten: 15 €</small>
+                        </div>
+                        <button class="btn btn-small" onclick="buyEnergyDrink()">KAUFEN</button>
                     </div>
+
+                    <div class="dashboard-grid">
+                        <button class="btn btn-nav" onclick="switchScreen('screen-setlist')">🎵 SETLIST EDITIEREN</button>
+                        <button class="btn btn-nav" onclick="switchScreen('screen-setup')">🎨 AVATAR & PROFIL ANPASSEN</button>
+                        <button class="btn btn-nav" onclick="nextDay()">🌙 NÄCHSTER TAG</button>
+                    </div>
+                </section>
+
+                <!-- SCREEN 3: SETLIST EDITOR -->
+                <section id="screen-setlist" class="view-screen">
+                    <h2 class="screen-title">✦ SETLIST EDITOR (25 TRACKS) ✦</h2>
+                    <p class="description">Stelle deine 25 Tracks für bevorstehende Gigs zusammen:</p>
+
+                    <div class="setlist-scroll-area">
+                        <div id="setlist-slots" class="setlist-grid"></div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="switchScreen('screen-dashboard')">⬅ ZURÜCK ZUM DASHBOARD</button>
                 </section>
 
             </main>
