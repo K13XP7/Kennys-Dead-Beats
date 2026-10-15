@@ -21,7 +21,7 @@
             </div>
         </header>
 
-        <!-- HAUPT-LAYOUT (3 SPALTEN) -->
+        <!-- HAUPT-LAYOUT (3 SPALTEN FULLSCREEN) -->
         <div class="main-layout">
             
             <!-- LINKES RACK (STATS & AVATAR) -->
@@ -29,7 +29,7 @@
                 <div class="panel-header">DJ PROFILE</div>
                 
                 <div class="avatar-box">
-                    <canvas id="profile-canvas-fallback" width="64" height="64"></canvas>
+                    <canvas id="profile-canvas-fallback" width="128" height="128"></canvas>
                 </div>
 
                 <div class="stat-item">
@@ -53,50 +53,73 @@
                 </div>
             </aside>
 
-            <!-- ZENTRALER BILDSCHIRM (HAUPT-VIEWPORT) -->
+            <!-- ZENTRALER BILDSCHIRM (HAUPT-VIEWPORT FULL MONITOR) -->
             <main class="center-viewport">
                 
-                <!-- SCREEN 1: CHARAKTERERSTELLUNG & 8-BIT BAUKASTEN (STARTSEITE) -->
+                <!-- SCREEN 1: CHARAKTERERSTELLUNG & HD-BAUKASTEN (STARTSEITE) -->
                 <section id="screen-setup" class="view-screen active">
-                    <h2 class="screen-title">✦ CHARAKTERERSTELLUNG & AVATAR ✦</h2>
+                    <h2 class="screen-title">✦ CHARAKTERERSTELLUNG & 8-BIT AVATAR BAUKASTEN ✦</h2>
                     
-                    <div class="form-group">
-                        <label for="dj-name">DJ-Name:</label>
-                        <input type="text" id="dj-name" class="input-field" value="Rotter">
-                    </div>
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label for="dj-name">DJ-Name:</label>
+                            <input type="text" id="dj-name" class="input-field" value="Rotter">
+                        </div>
 
-                    <div class="form-group">
-                        <label for="main-genre-select">Haupt-Subgenre (100% Potenzial):</label>
-                        <select id="main-genre-select" class="input-field"></select>
+                        <div class="form-group flex-1">
+                            <label for="main-genre-select">Haupt-Subgenre (100% Potenzial):</label>
+                            <select id="main-genre-select" class="input-field"></select>
+                        </div>
                     </div>
 
                     <div class="editor-layout">
                         <!-- LINKS: LIVE-CANVAS-PREVIEW -->
                         <div class="preview-area">
-                            <canvas id="avatar-canvas" width="64" height="64"></canvas>
-                            <span class="preview-label">LIVE-VORSCHAU</span>
+                            <canvas id="avatar-canvas" width="128" height="128"></canvas>
+                            <span class="preview-label">LIVE-VORSCHAU (128x128)</span>
                         </div>
 
-                        <!-- RECHTS: BAUKASTEN-EINSTELLUNGEN -->
-                        <div class="controls-area">
+                        <!-- RECHTS: ERWEITERTE BAUKASTEN-EINSTELLUNGEN -->
+                        <div class="controls-area grid-2-col">
                             <div class="form-group">
                                 <label>Hautton / Teint:</label>
                                 <select id="layer-skin" class="input-field" onchange="renderCustomAvatar()">
-                                    <option value="pale">Ethereal Pale (Blass)</option>
                                     <option value="ghost">Ghost White (Geisterweiß)</option>
-                                    <option value="cyber">Cyber Slate (Schiefergrau)</option>
-                                    <option value="warm">Dusk Tone (Dunkel)</option>
+                                    <option value="pale">Ethereal Pale (Blass-Rosa)</option>
+                                    <option value="cyber">Cyber Blue (Neon-Grau)</option>
+                                    <option value="warm">Dusk Bronze (Dunkel)</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label>Frisur:</label>
+                                <label>Frisur & Schnitt:</label>
                                 <select id="layer-hair" class="input-field" onchange="renderCustomAvatar()">
-                                    <option value="trad">Trad-Goth (Teased Hair)</option>
-                                    <option value="postpunk">Post-Punk (Asym Bob)</option>
-                                    <option value="spikes">Deathrock (Spikes / Iro)</option>
-                                    <option value="cyberdreads">Cybergoth (Dreadfalls)</option>
-                                    <option value="buzz">EBM (Buzzcut)</option>
+                                    <option value="trad">Trad-Goth (Riesiges Teased Hair)</option>
+                                    <option value="postpunk">Post-Punk (Extremer Asym Bob)</option>
+                                    <option value="spikes">Deathrock (Hoher Deathhawk / Iro)</option>
+                                    <option value="cyberdreads">Cybergoth (Lange Neon Dreads)</option>
+                                    <option value="buzz">EBM (Kahl / Stoppel Undercut)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Haarfarbe:</label>
+                                <select id="layer-haircolor" class="input-field" onchange="renderCustomAvatar()">
+                                    <option value="black">Obsidian Schwarz</option>
+                                    <option value="purple">Neon Purple</option>
+                                    <option value="cyan">Cyan Pulse</option>
+                                    <option value="red">Blood Red</option>
+                                    <option value="silver">White Silver</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Augenbrauen:</label>
+                                <select id="layer-brows" class="input-field" onchange="renderCustomAvatar()">
+                                    <option value="heavy">Gerade dicke Goth-Brauen</option>
+                                    <option value="arch">Steile geschwungene Brauen</option>
+                                    <option value="pierced">Braue mit Silber-Ring</option>
+                                    <option value="none">Keine Brauen (Rasierte Stirn)</option>
                                 </select>
                             </div>
 
@@ -104,28 +127,40 @@
                                 <label>Augen & Makeup:</label>
                                 <select id="layer-eyes" class="input-field" onchange="renderCustomAvatar()">
                                     <option value="heavy">Heavy Winged Eyeliner</option>
-                                    <option value="cateye">Cat-Eye Makeup</option>
-                                    <option value="smudge">Smudged Goth Makeup</option>
-                                    <option value="visor">Cyber LED Visor</option>
+                                    <option value="cateye">Extremes Cat-Eye Makeup</option>
+                                    <option value="smudge">Tropfendes / Verlaufenes Makeup</option>
+                                    <option value="visor">Glühender Cyber LED Visor</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label>Mund / Lippen:</label>
+                                <label>Mund & Lippenstift:</label>
                                 <select id="layer-mouth" class="input-field" onchange="renderCustomAvatar()">
-                                    <option value="black">Black Lipstick</option>
-                                    <option value="pale">Pale Lips</option>
-                                    <option value="piercing">Lip Piercing</option>
-                                    <option value="mask">Respirator / Maske</option>
+                                    <option value="black">Schwarzer Lippenstift</option>
+                                    <option value="purple">Lila Lippenstift</option>
+                                    <option value="pale">Natur / Blass</option>
+                                    <option value="piercing">Snake Bites Piercings</option>
+                                    <option value="mask">Atemschutz / Gasmaske</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
-                                <label>Accessoire:</label>
+                                <label>Gesichts-Details:</label>
+                                <select id="layer-face-detail" class="input-field" onchange="renderCustomAvatar()">
+                                    <option value="none">Keine</option>
+                                    <option value="spiderweb">Spinnennetz auf Wange</option>
+                                    <option value="bat">Fledermaus-Tattoo</option>
+                                    <option value="piercings">Nasen- & Wangen-Studs</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Accessoires:</label>
                                 <select id="layer-acc" class="input-field" onchange="renderCustomAvatar()">
-                                    <option value="none">Keines</option>
-                                    <option value="choker">Spiked Choker</option>
-                                    <option value="sunglasses">Oval Dark Glasses</option>
+                                    <option value="none">Keine</option>
+                                    <option value="choker">Spiked Ring Choker</option>
+                                    <option value="sunglasses">Dunkle Oval-Sonnenbrille</option>
+                                    <option value="tiara">Spitzen-Diadem / Bat Tiara</option>
                                 </select>
                             </div>
                         </div>
