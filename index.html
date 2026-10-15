@@ -11,126 +11,132 @@
 </head>
 <body>
 
-    <div class="game-screen">
+    <div class="game-container">
         
-        <!-- LINKES RACK (STEUERUNG & STATS) -->
-        <aside class="side-rack left-rack">
-            <div class="avatar-box">
-                <img id="current-avatar" src="" alt="DJ Avatar">
+        <!-- HEADER / KOPFZEILE -->
+        <header class="main-header">
+            <h1 class="game-title">💀 GRAVEYARD NOISE: DJ SIMULATOR</h1>
+            <div class="header-status">
+                <span>DATUM: <strong id="date-display">02. OKT 2026</strong></span>
             </div>
+        </header>
 
-            <div class="stat-group">
-                <div class="stat-label">DJ NAME</div>
-                <div class="stat-value highlight" id="name-display">---</div>
-            </div>
-
-            <div class="stat-group">
-                <div class="stat-label">DATUM</div>
-                <div class="stat-value" id="date-display">02. OKT 2026</div>
-            </div>
-
-            <div class="stat-group">
-                <div class="stat-label">BARGELD (€)</div>
-                <div class="stat-value cash" id="cash-display">300</div>
-            </div>
-
-            <div class="stat-group">
-                <div class="stat-label">REPUTATION</div>
-                <div class="stat-value rep" id="rep-display">0</div>
-            </div>
-
-            <div class="stat-group">
-                <div class="stat-label">SKILL (0-100)</div>
-                <div class="stat-value" id="skill-display">10</div>
-            </div>
-        </aside>
-
-        <!-- ZENTRALER MONITOR / VIEWPORT -->
-        <main class="viewport-content">
+        <!-- HAUPT-LAYOUT (3 SPALTEN) -->
+        <div class="main-layout">
             
-            <!-- SCREEN 1: CHARAKTERERSTELLUNG -->
-            <section id="screen-setup" class="view-screen active">
-                <div class="panel-title">💀 CHARAKTERERSTELLUNG</div>
+            <!-- LINKES RACK (STATS & AVATAR) -->
+            <aside class="side-panel left-panel">
+                <div class="panel-header">DJ PROFILE</div>
                 
-                <div class="form-group">
-                    <label for="dj-name">DJ-Name:</label>
-                    <input type="text" id="dj-name" class="input-text" placeholder="z. B. DJ Rotter" value="DJ Rotter">
+                <div class="avatar-box">
+                    <img id="current-avatar" src="assets/images/avatars/trad_goth_f.png" alt="Avatar" onerror="this.style.opacity='0.2'">
                 </div>
 
-                <div class="form-group">
-                    <label for="main-genre-select">Haupt-Subgenre (100% Potenzial):</label>
-                    <select id="main-genre-select" class="select-box"></select>
+                <div class="stat-item">
+                    <span class="stat-label">NAME</span>
+                    <span class="stat-value highlight" id="name-display">---</span>
                 </div>
 
-                <div class="form-group">
-                    <label>Wähle deinen Avatar (10 Pixel-Porträts):</label>
-                    <div class="avatar-grid" id="avatar-picker"></div>
+                <div class="stat-item">
+                    <span class="stat-label">BARGELD</span>
+                    <span class="stat-value cash"><span id="cash-display">300</span> €</span>
                 </div>
 
-                <button class="btn btn-main" onclick="finishCharacterSetup()">KARRIERE STARTEN</button>
-            </section>
+                <div class="stat-item">
+                    <span class="stat-label">REPUTATION</span>
+                    <span class="stat-value rep" id="rep-display">0</span>
+                </div>
 
-            <!-- SCREEN 2: DASHBOARD / HAUPTMENÜ -->
-            <section id="screen-dashboard" class="view-screen">
-                <div class="panel-title">🎛️ HAUPTMENÜ & ZENTRALE</div>
+                <div class="stat-item">
+                    <span class="stat-label">SKILL</span>
+                    <span class="stat-value" id="skill-display">10</span>
+                </div>
+            </aside>
+
+            <!-- ZENTRALER BILDSCHIRM (HAUPT-VIEWPORT) -->
+            <main class="center-viewport">
                 
-                <p class="hint-text">Willkommen im Untergrund. Nutze deine Zeit, um dein Set aufzubauen, dich zu erholen oder Auftritte anzunehmen.</p>
-                
-                <div class="booster-box">
-                    <span>☕ Energy-Drink trinken (+25 Energie, -15 €)</span>
-                    <button class="btn btn-small" onclick="buyEnergyDrink()">KAUFEN</button>
+                <!-- SCREEN 1: CHARAKTERERSTELLUNG -->
+                <section id="screen-setup" class="view-screen active">
+                    <h2 class="screen-title">✦ CHARAKTERERSTELLUNG ✦</h2>
+                    
+                    <div class="form-group">
+                        <label for="dj-name">DJ-Name:</label>
+                        <input type="text" id="dj-name" class="input-field" value="DJ Rotter">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="main-genre-select">Haupt-Subgenre (100% Potenzial):</label>
+                        <select id="main-genre-select" class="input-field"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Wähle deinen Avatar:</label>
+                        <div class="avatar-grid" id="avatar-picker"></div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="finishCharacterSetup()">KARRIERE STARTEN</button>
+                </section>
+
+                <!-- SCREEN 2: DASHBOARD -->
+                <section id="screen-dashboard" class="view-screen">
+                    <h2 class="screen-title">✦ ZENTRALE / DASHBOARD ✦</h2>
+                    <p class="description">Willkommen im Untergrund. Plane deine nächsten Schritte:</p>
+                    
+                    <div class="action-card">
+                        <div class="action-info">
+                            <strong>Energy-Drink trinken</strong>
+                            <small>+25 Energie | Kosten: 15 €</small>
+                        </div>
+                        <button class="btn btn-small" onclick="buyEnergyDrink()">KAUFEN</button>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <button class="btn btn-nav" onclick="switchScreen('screen-setlist')">🎵 SETLIST EDITIEREN (25 SLOTS)</button>
+                        <button class="btn btn-nav" onclick="nextDay()">🌙 NÄCHSTER TAG (+10 ENERGIE)</button>
+                    </div>
+                </section>
+
+                <!-- SCREEN 3: SETLIST EDITOR -->
+                <section id="screen-setlist" class="view-screen">
+                    <h2 class="screen-title">✦ SETLIST EDITOR (25 TRACKS) ✦</h2>
+                    <p class="description">Stelle deine 25 Tracks für bevorstehende Gigs zusammen:</p>
+
+                    <div class="setlist-scroll-area">
+                        <div id="setlist-slots" class="setlist-grid"></div>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="switchScreen('screen-dashboard')">⬅ ZURÜCK ZUM DASHBOARD</button>
+                </section>
+
+            </main>
+
+            <!-- RECHTES RACK (STATUS & TERMINE) -->
+            <aside class="side-panel right-panel">
+                <div class="panel-header">STATUS</div>
+
+                <div class="stat-item">
+                    <span class="stat-label">ENERGIE (<span id="energy-text">100%</span>)</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="energy-bar" style="width: 100%;"></div>
+                    </div>
                 </div>
 
-                <div class="nav-buttons-grid">
-                    <button class="btn btn-nav" onclick="switchScreen('screen-setlist')">🎵 SETLIST EDITIEREN</button>
-                    <button class="btn btn-nav" onclick="nextDay()">🌙 NÄCHSTER TAG (+10 ENERGIE)</button>
-                </div>
-            </section>
-
-            <!-- SCREEN 3: SETLIST EDITOR -->
-            <section id="screen-setlist" class="view-screen">
-                <div class="panel-title">🎧 SETLIST EDITOR</div>
-                <p class="hint-text">Stelle deine Tracks für die kommenden Gigs zusammen:</p>
-
-                <div class="setlist-container">
-                    <div id="setlist-slots" class="setlist-slots"></div>
+                <div class="stat-item">
+                    <span class="stat-label">HAUPT-GENRE</span>
+                    <span class="stat-value genre-tag" id="main-genre-display">---</span>
                 </div>
 
-                <div class="setlist-actions">
-                    <button class="btn btn-small" onclick="switchScreen('screen-dashboard')">⬅ ZURÜCK ZUM DASHBOARD</button>
-                </div>
-            </section>
+                <div class="panel-header" style="margin-top: 15px;">📅 GIG TERMINE</div>
+                <div id="gigs-display" class="gig-list-empty">Keine anstehenden Gigs</div>
+            </aside>
 
-        </main>
+        </div>
 
-        <!-- RECHTES RACK (STATUS & TERMINE) -->
-        <aside class="side-rack right-rack">
-            <div class="stat-group">
-                <div class="stat-label">ENERGIE <span id="energy-text">100%</span></div>
-                <div class="energy-bar-container">
-                    <div class="energy-bar-fill" id="energy-bar" style="width: 100%;"></div>
-                </div>
-            </div>
-
-            <div class="stat-group">
-                <div class="stat-label">HAUPT-GENRE</div>
-                <div class="stat-value genre-tag" id="main-genre-display">---</div>
-            </div>
-
-            <div class="stat-group">
-                <div class="stat-label">📅 TERMINE</div>
-                <p class="hint-text" id="gigs-display" style="margin-top: 4px;">Keine anstehenden Gigs</p>
-            </div>
-        </aside>
-
-        <!-- UNTERE KONSOLE (CHRONIK & MELDUNGEN) -->
-        <footer class="bottom-console">
-            <div class="now-playing" id="scene-news">AKTUELLE SZENE-MELDUNG: Willkommen in der Düsterszene.</div>
-            <div class="log-panel">
-                <div class="log-entries" id="log-entries">
-                    <div class="log-entry">📜 <span class="date">[02. OKT 2026]</span> Chronik gestartet.</div>
-                </div>
-            </div>
+        <!-- FOOTER / CHRONIK -->
+        <footer class="bottom-log">
+            <div class="news-ticker" id="scene-news">AKTUELLE SZENE-MELDUNG: Willkommen in der Düsterszene.</div>
+            <div class="log-scroll" id="log-entries"></div>
         </footer>
 
     </div>
