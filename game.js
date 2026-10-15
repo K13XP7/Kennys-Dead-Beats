@@ -17,7 +17,7 @@ let gameState = {
     rep: 0,
     skill: 10,
     energy: 100,
-    setlist: new Array(25).fill("post_punk")
+    setlist: new Array(25).fill("batcave")
 };
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -164,7 +164,7 @@ function renderSetlistEditor() {
     }
 }
 
-// 128x128 CANVAS MIT KONTRASTREICHEM HINTERGRUND UND KONTUR-GLOW
+// FULL 128x128 CANVAS BAUKASTEN (PROPORTIONIERT & DETAILLIERT)
 function renderCustomAvatar() {
     const canvas = document.getElementById("avatar-canvas");
     if (!canvas) return;
@@ -180,217 +180,63 @@ function renderCustomAvatar() {
     const detailType = document.getElementById("layer-face-detail")?.value || "none";
     const accType = document.getElementById("layer-acc")?.value || "none";
 
-    // 1. KONTRAST-HINTERGRUND ZEICHNEN
+    // 1. KONTRAST-HINTERGRUND
     if (bgType === "crimson") {
-        let grad = ctx.createRadialGradient(64, 64, 10, 64, 64, 70);
-        grad.addColorStop(0, "#4a0018");
-        grad.addColorStop(1, "#0d0206");
+        let grad = ctx.createRadialGradient(64, 64, 8, 64, 64, 64);
+        grad.addColorStop(0, "#5a001a");
+        grad.addColorStop(1, "#0a0005");
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 128, 128);
     } else if (bgType === "violet") {
-        let grad = ctx.createRadialGradient(64, 64, 10, 64, 64, 70);
-        grad.addColorStop(0, "#3a0066");
-        grad.addColorStop(1, "#0a0014");
+        let grad = ctx.createRadialGradient(64, 64, 8, 64, 64, 64);
+        grad.addColorStop(0, "#4a007a");
+        grad.addColorStop(1, "#080012");
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 128, 128);
     } else if (bgType === "cyber") {
-        ctx.fillStyle = "#020d18";
+        ctx.fillStyle = "#040e1a";
         ctx.fillRect(0, 0, 128, 128);
-        ctx.fillStyle = "#00334e";
+        ctx.fillStyle = "rgba(0, 243, 255, 0.15)";
         for (let i = 0; i < 128; i += 16) {
             ctx.fillRect(i, 0, 1, 128);
             ctx.fillRect(0, i, 128, 1);
         }
     } else if (bgType === "slate") {
-        ctx.fillStyle = "#22222e";
+        ctx.fillStyle = "#222230";
         ctx.fillRect(0, 0, 128, 128);
     } else {
-        ctx.fillStyle = "#050508";
+        ctx.fillStyle = "#08080d";
         ctx.fillRect(0, 0, 128, 128);
     }
 
-    // Farbkarten
-    const skinColors = { ghost: "#ffffff", pale: "#e8d8d8", cyber: "#5c6b73", warm: "#4a3b32" };
-    const hairColors = { black: "#0b0b12", purple: "#9d00ff", cyan: "#00f3ff", red: "#e60039", silver: "#e0e0f0" };
+    const skinColors = { ghost: "#f2f2f7", pale: "#e5d0d0", cyber: "#687788", warm: "#544338" };
+    const hairColors = { black: "#111118", purple: "#8a2be2", cyan: "#00f3ff", red: "#c71585", silver: "#d0d0e0" };
 
-    const cSkin = skinColors[skinType] || "#ffffff";
-    const cHair = hairColors[hairColor] || "#0b0b12";
+    const cSkin = skinColors[skinType] || "#f2f2f7";
+    const cHair = hairColors[hairColor] || "#111118";
 
-    // KONTUR-GLOW FÜR SCHWARZE HAARE
-    const outlineColor = (hairColor === "black") ? "rgba(160, 160, 200, 0.4)" : "transparent";
-
-    // 2. HAAR-KONTUR (Outlining, damit dunkles Haar sichtbar ist)
-    if (outlineColor !== "transparent") {
-        ctx.fillStyle = outlineColor;
-        if (hairType === "trad") {
-            ctx.fillRect(14, 4, 100, 38);
-            ctx.fillRect(10, 28, 30, 64);
-            ctx.fillRect(88, 28, 30, 64);
-        } else if (hairType === "postpunk") {
-            ctx.fillRect(30, 14, 68, 26);
-            ctx.fillRect(22, 36, 34, 64);
-        } else if (hairType === "spikes") {
-            ctx.fillRect(52, 0, 24, 40);
-            ctx.fillRect(48, 8, 32, 28);
-        } else if (hairType === "cyberdreads") {
-            ctx.fillRect(18, 28, 20, 84);
-            ctx.fillRect(90, 28, 20, 84);
-        }
-    }
-
-    // 3. KOPF & GESICHTSFORM
+    // 2. KOPF & GESICHTSFORM (ANATOMISCH Schlank)
     ctx.fillStyle = cSkin;
-    if (hairType === "buzz") {
-        ctx.fillRect(36, 32, 56, 68);
-    } else {
-        ctx.fillRect(38, 34, 52, 66);
-    }
-    ctx.fillRect(52, 98, 24, 22);
+    ctx.fillRect(42, 38, 44, 52); // Gesicht
+    ctx.fillRect(56, 90, 16, 18); // Hals
 
-    // WANGENSCHATTEN / KONTUR
-    ctx.fillStyle = "rgba(0,0,0,0.25)";
-    ctx.fillRect(38, 80, 52, 20);
+    // WANGENSCHATTEN & KINNKONTUR
+    ctx.fillStyle = "rgba(0,0,0,0.18)";
+    ctx.fillRect(42, 76, 44, 14);
+    ctx.fillRect(42, 86, 6, 4);
+    ctx.fillRect(80, 86, 6, 4);
 
-    // OBERBEKLEIDUNG
-    ctx.fillStyle = "#12121c";
-    ctx.fillRect(20, 114, 88, 14);
+    // OBERBEKLEIDUNG / KRAGEN
+    ctx.fillStyle = "#12121a";
+    ctx.fillRect(28, 108, 72, 20);
+    ctx.fillStyle = "#222230";
+    ctx.fillRect(52, 108, 24, 20);
 
-    // 4. GESICHTS-DETAILS
+    // 3. GESICHTS-DETAILS
     if (detailType === "spiderweb") {
         ctx.fillStyle = "#11111a";
-        ctx.fillRect(40, 68, 14, 2);
-        ctx.fillRect(42, 64, 2, 12);
+        ctx.fillRect(44, 68, 14, 2);
         ctx.fillRect(46, 64, 2, 12);
+        ctx.fillRect(50, 64, 2, 12);
     } else if (detailType === "bat") {
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(40, 72, 10, 4);
-        ctx.fillRect(43, 70, 4, 8);
-    } else if (detailType === "piercings") {
-        ctx.fillStyle = "#00f3ff";
-        ctx.fillRect(40, 74, 4, 4);
-        ctx.fillRect(84, 74, 4, 4);
-    }
-
-    // 5. AUGENBRAUEN
-    ctx.fillStyle = cHair;
-    if (browsType === "arch") {
-        ctx.fillRect(44, 48, 14, 3);
-        ctx.fillRect(70, 48, 14, 3);
-        ctx.fillRect(56, 50, 4, 2);
-        ctx.fillRect(68, 50, 4, 2);
-    } else if (browsType === "pierced") {
-        ctx.fillRect(44, 52, 14, 3);
-        ctx.fillRect(70, 52, 14, 3);
-        ctx.fillStyle = "#00f3ff";
-        ctx.fillRect(52, 51, 3, 5);
-    } else if (browsType === "heavy") {
-        ctx.fillRect(42, 52, 16, 4);
-        ctx.fillRect(70, 52, 16, 4);
-    }
-
-    // 6. AUGEN / MAKEUP
-    ctx.fillStyle = "#000000";
-    if (eyesType === "heavy") {
-        ctx.fillRect(40, 58, 20, 8);
-        ctx.fillRect(68, 58, 20, 8);
-        ctx.fillRect(36, 56, 6, 4);
-        ctx.fillRect(86, 56, 6, 4);
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(50, 60, 4, 4);
-        ctx.fillRect(74, 60, 4, 4);
-    } else if (eyesType === "cateye") {
-        ctx.fillRect(42, 56, 18, 12);
-        ctx.fillRect(68, 56, 18, 12);
-        ctx.fillStyle = "#8a2be2";
-        ctx.fillRect(44, 58, 14, 8);
-        ctx.fillRect(70, 58, 14, 8);
-    } else if (eyesType === "smudge") {
-        ctx.fillRect(44, 58, 16, 8);
-        ctx.fillRect(68, 58, 16, 8);
-        ctx.fillRect(46, 66, 3, 10);
-        ctx.fillRect(52, 66, 3, 14);
-        ctx.fillRect(72, 66, 3, 12);
-        ctx.fillRect(78, 66, 3, 8);
-    } else if (eyesType === "visor") {
-        ctx.fillStyle = "#00f3ff";
-        ctx.fillRect(36, 54, 56, 14);
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(40, 56, 48, 2);
-    }
-
-    // 7. MUND & LIPPEN
-    if (mouthType === "mask") {
-        ctx.fillStyle = "#181824";
-        ctx.fillRect(42, 76, 44, 26);
-        ctx.fillStyle = "#00f3ff";
-        ctx.fillRect(60, 84, 8, 8);
-    } else {
-        ctx.fillStyle = mouthType === "purple" ? "#9d00ff" : (mouthType === "black" ? "#000000" : "#d8a0b0");
-        ctx.fillRect(54, 86, 20, 6);
-        if (mouthType === "piercing") {
-            ctx.fillStyle = "#00f3ff";
-            ctx.fillRect(52, 92, 3, 4);
-            ctx.fillRect(73, 92, 3, 4);
-        }
-    }
-
-// 8. HAAR-STILE (Trad-Goth neu: Zackig & Toupierte 80s-Spikes)
-    ctx.fillStyle = cHair;
-    if (hairType === "trad") {
-        // Haupthaar-Volumen oben
-        ctx.fillRect(20, 10, 88, 20);
-        
-        // Zackige Spikes nach oben & zu den Seiten
-        ctx.fillRect(28, 4, 16, 12);
-        ctx.fillRect(52, 2, 24, 14);
-        ctx.fillRect(84, 4, 16, 12);
-        
-        // Wilde seitliche Strähnen (keine runde Afro-Kugel mehr!)
-        ctx.fillRect(12, 20, 20, 16);
-        ctx.fillRect(8, 32, 20, 36);
-        ctx.fillRect(16, 64, 16, 28);
-
-        ctx.fillRect(96, 20, 20, 16);
-        ctx.fillRect(100, 32, 20, 36);
-        ctx.fillRect(96, 64, 16, 28);
-    }
-
-    // 9. ACCESSOIRES
-    if (accType === "sunglasses") {
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(38, 54, 52, 16);
-        ctx.fillStyle = "#8a2be2";
-        ctx.fillRect(40, 56, 6, 4);
-    } else if (accType === "choker") {
-        ctx.fillStyle = "#000000";
-        ctx.fillRect(52, 102, 24, 8);
-        ctx.fillStyle = "#00f3ff";
-        ctx.fillRect(62, 102, 4, 8);
-    } else if (accType === "tiara") {
-        ctx.fillStyle = "#8a2be2";
-        ctx.fillRect(48, 22, 32, 4);
-        ctx.fillRect(52, 16, 4, 6);
-        ctx.fillRect(62, 12, 4, 10);
-        ctx.fillRect(72, 16, 4, 6);
-    }
-
-    drawCanvasTo("profile-canvas-fallback");
-}
-
-function drawCanvasTo(targetCanvasId) {
-    const srcCanvas = document.getElementById("avatar-canvas");
-    const targetCanvas = document.getElementById(targetCanvasId);
-    if (!srcCanvas || !targetCanvas) return;
-    const targetCtx = targetCanvas.getContext("2d");
-    targetCtx.drawImage(srcCanvas, 0, 0);
-}
-
-function updateUI() {
-    document.getElementById("date-display").innerText = getFormattedDate();
-    document.getElementById("cash-display").innerText = gameState.cash;
-    document.getElementById("rep-display").innerText = gameState.rep;
-    document.getElementById("skill-display").innerText = gameState.skill;
-    
-    document.getElementById("energy-text").innerText = `${gameState.energy}%`;
-    document.getElementById("energy-bar").style.width = `${gameState.energy}%`;
-}
+        ctx.fillStyle = "#000000
