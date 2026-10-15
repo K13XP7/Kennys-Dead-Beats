@@ -169,16 +169,13 @@ function renderSetlistEditor() {
     }
 }
 
-// 128x128 STARK VARIATIVE CANVAS LOGIK
+// 128x128 CANVAS MIT KONTRASTREICHEM HINTERGRUND UND KONTUR-GLOW
 function renderCustomAvatar() {
     const canvas = document.getElementById("avatar-canvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
 
-    // Hintergrund
-    ctx.fillStyle = "#06050a";
-    ctx.fillRect(0, 0, 128, 128);
-
+    const bgType = document.getElementById("layer-bg")?.value || "crimson";
     const skinType = document.getElementById("layer-skin")?.value || "ghost";
     const hairType = document.getElementById("layer-hair")?.value || "trad";
     const hairColor = document.getElementById("layer-haircolor")?.value || "black";
@@ -188,21 +185,72 @@ function renderCustomAvatar() {
     const detailType = document.getElementById("layer-face-detail")?.value || "none";
     const accType = document.getElementById("layer-acc")?.value || "none";
 
+    // 1. KONTRAST-HINTERGRUND ZEICHNEN
+    if (bgType === "crimson") {
+        let grad = ctx.createRadialGradient(64, 64, 10, 64, 64, 70);
+        grad.addColorStop(0, "#4a0018");
+        grad.addColorStop(1, "#0d0206");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 128, 128);
+    } else if (bgType === "violet") {
+        let grad = ctx.createRadialGradient(64, 64, 10, 64, 64, 70);
+        grad.addColorStop(0, "#3a0066");
+        grad.addColorStop(1, "#0a0014");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 128, 128);
+    } else if (bgType === "cyber") {
+        ctx.fillStyle = "#020d18";
+        ctx.fillRect(0, 0, 128, 128);
+        ctx.fillStyle = "#00334e";
+        for (let i = 0; i < 128; i += 16) {
+            ctx.fillRect(i, 0, 1, 128);
+            ctx.fillRect(0, i, 128, 1);
+        }
+    } else if (bgType === "slate") {
+        ctx.fillStyle = "#22222e";
+        ctx.fillRect(0, 0, 128, 128);
+    } else {
+        ctx.fillStyle = "#050508";
+        ctx.fillRect(0, 0, 128, 128);
+    }
+
     // Farbkarten
     const skinColors = { ghost: "#ffffff", pale: "#e8d8d8", cyber: "#5c6b73", warm: "#4a3b32" };
-    const hairColors = { black: "#08080c", purple: "#9d00ff", cyan: "#00f3ff", red: "#e60039", silver: "#e0e0f0" };
+    const hairColors = { black: "#0b0b12", purple: "#9d00ff", cyan: "#00f3ff", red: "#e60039", silver: "#e0e0f0" };
 
     const cSkin = skinColors[skinType] || "#ffffff";
-    const cHair = hairColors[hairColor] || "#08080c";
+    const cHair = hairColors[hairColor] || "#0b0b12";
 
-    // 1. KOPF & GESICHTSFORM (Je nach Typ leicht anders)
+    // KONTUR-GLOW FÜR SCHWARZE HAARE
+    const outlineColor = (hairColor === "black") ? "rgba(160, 160, 200, 0.4)" : "transparent";
+
+    // 2. HAAR-KONTUR (Outlining, damit dunkles Haar sichtbar ist)
+    if (outlineColor !== "transparent") {
+        ctx.fillStyle = outlineColor;
+        if (hairType === "trad") {
+            ctx.fillRect(14, 4, 100, 38);
+            ctx.fillRect(10, 28, 30, 64);
+            ctx.fillRect(88, 28, 30, 64);
+        } else if (hairType === "postpunk") {
+            ctx.fillRect(30, 14, 68, 26);
+            ctx.fillRect(22, 36, 34, 64);
+        } else if (hairType === "spikes") {
+            ctx.fillRect(52, 0, 24, 40);
+            ctx.fillRect(48, 8, 32, 28);
+        } else if (hairType === "cyberdreads") {
+            ctx.fillRect(18, 28, 20, 84);
+            ctx.fillRect(90, 28, 20, 84);
+        }
+    }
+
+    // 3. KOPF & GESICHTSFORM
     ctx.fillStyle = cSkin;
     if (hairType === "buzz") {
-        ctx.fillRect(36, 32, 56, 68); // Breiterer Kopf
+        ctx.fillRect(36, 32, 56, 68);
     } else {
-        ctx.fillRect(38, 34, 52, 66); // Schlanker Kopf
+        ctx.fillRect(38, 34, 52, 66);
     }
-    ctx.fillRect(52, 98, 24, 22); // Hals
+    ctx.fillRect(52, 98, 24, 22);
 
     // WANGENSCHATTEN / KONTUR
     ctx.fillStyle = "rgba(0,0,0,0.25)";
@@ -212,7 +260,7 @@ function renderCustomAvatar() {
     ctx.fillStyle = "#12121c";
     ctx.fillRect(20, 114, 88, 14);
 
-    // 2. GESICHTS-DETAILS
+    // 4. GESICHTS-DETAILS
     if (detailType === "spiderweb") {
         ctx.fillStyle = "#11111a";
         ctx.fillRect(40, 68, 14, 2);
@@ -228,7 +276,7 @@ function renderCustomAvatar() {
         ctx.fillRect(84, 74, 4, 4);
     }
 
-    // 3. AUGENBRAUEN
+    // 5. AUGENBRAUEN
     ctx.fillStyle = cHair;
     if (browsType === "arch") {
         ctx.fillRect(44, 48, 14, 3);
@@ -239,16 +287,15 @@ function renderCustomAvatar() {
         ctx.fillRect(44, 52, 14, 3);
         ctx.fillRect(70, 52, 14, 3);
         ctx.fillStyle = "#00f3ff";
-        ctx.fillRect(52, 51, 3, 5); // Ring
+        ctx.fillRect(52, 51, 3, 5);
     } else if (browsType === "heavy") {
         ctx.fillRect(42, 52, 16, 4);
         ctx.fillRect(70, 52, 16, 4);
     }
 
-    // 4. AUGEN / MAKEUP (DEUTLICHE UNTERSCHEIDUNG)
+    // 6. AUGEN / MAKEUP
     ctx.fillStyle = "#000000";
     if (eyesType === "heavy") {
-        // Winged Liner
         ctx.fillRect(40, 58, 20, 8);
         ctx.fillRect(68, 58, 20, 8);
         ctx.fillRect(36, 56, 6, 4);
@@ -263,7 +310,6 @@ function renderCustomAvatar() {
         ctx.fillRect(44, 58, 14, 8);
         ctx.fillRect(70, 58, 14, 8);
     } else if (eyesType === "smudge") {
-        // Tropfendes Makeup
         ctx.fillRect(44, 58, 16, 8);
         ctx.fillRect(68, 58, 16, 8);
         ctx.fillRect(46, 66, 3, 10);
@@ -277,7 +323,7 @@ function renderCustomAvatar() {
         ctx.fillRect(40, 56, 48, 2);
     }
 
-    // 5. MUND & LIPPEN
+    // 7. MUND & LIPPEN
     if (mouthType === "mask") {
         ctx.fillStyle = "#181824";
         ctx.fillRect(42, 76, 44, 26);
@@ -293,34 +339,29 @@ function renderCustomAvatar() {
         }
     }
 
-    // 6. HAAR-STILE (EXTREME UNTERSCHEIDE)
+    // 8. HAAR-STILE
     ctx.fillStyle = cHair;
     if (hairType === "trad") {
-        // Riesiges toupiertes Haar
         ctx.fillRect(16, 6, 96, 34);
         ctx.fillRect(12, 30, 26, 60);
         ctx.fillRect(90, 30, 26, 60);
     } else if (hairType === "postpunk") {
-        // Asymmetrischer Bob
         ctx.fillRect(32, 16, 64, 22);
-        ctx.fillRect(24, 38, 30, 60); // Sehr lang links
-        ctx.fillRect(84, 38, 12, 20); // Kurz rechts
+        ctx.fillRect(24, 38, 30, 60);
+        ctx.fillRect(84, 38, 12, 20);
     } else if (hairType === "spikes") {
-        // Hoher Iro
         ctx.fillRect(54, 2, 20, 36);
         ctx.fillRect(50, 10, 28, 24);
         ctx.fillRect(46, 18, 36, 16);
     } else if (hairType === "cyberdreads") {
-        // Neon Dreads
         ctx.fillRect(36, 16, 56, 18);
         ctx.fillRect(20, 30, 16, 80);
         ctx.fillRect(92, 30, 16, 80);
     } else if (hairType === "buzz") {
-        // Stoppel-Undercut
         ctx.fillRect(38, 26, 52, 10);
     }
 
-    // 7. ACCESSOIRES
+    // 9. ACCESSOIRES
     if (accType === "sunglasses") {
         ctx.fillStyle = "#000000";
         ctx.fillRect(38, 54, 52, 16);
