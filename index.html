@@ -15,7 +15,7 @@
         
         <!-- HEADER / KOPFZEILE -->
         <header class="main-header">
-            <h1 class="game-title">💀 GRAVEYARD NOISE: DJ SIMULATOR</h1>
+            <h1 class="game-title">💀 KENNYS DEAD BEATS: DJ SIMULATOR</h1>
             <div class="header-status">
                 <span>DATUM: <strong id="date-display">02. OKT 2026</strong></span>
             </div>
@@ -29,7 +29,7 @@
                 <div class="panel-header">DJ PROFILE</div>
                 
                 <div class="avatar-box">
-                    <img id="current-avatar" src="assets/images/avatars/trad_goth_f.png" alt="Avatar" onerror="this.style.opacity='0.2'">
+                    <img id="current-avatar" src="" alt="Avatar" onerror="this.style.opacity='0.2'">
                 </div>
 
                 <div class="stat-item">
@@ -71,7 +71,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Wähle deinen Avatar:</label>
+                        <label>Wähle deinen Start-Avatar:</label>
                         <div class="avatar-grid" id="avatar-picker"></div>
                     </div>
 
@@ -93,6 +93,7 @@
 
                     <div class="dashboard-grid">
                         <button class="btn btn-nav" onclick="switchScreen('screen-setlist')">🎵 SETLIST EDITIEREN (25 SLOTS)</button>
+                        <button class="btn btn-nav" onclick="switchScreen('screen-avatar-editor')">🎨 AVATAR-BAUKASTEN</button>
                         <button class="btn btn-nav" onclick="nextDay()">🌙 NÄCHSTER TAG (+10 ENERGIE)</button>
                     </div>
                 </section>
@@ -107,6 +108,75 @@
                     </div>
 
                     <button class="btn btn-secondary" onclick="switchScreen('screen-dashboard')">⬅ ZURÜCK ZUM DASHBOARD</button>
+                </section>
+
+                <!-- SCREEN 4: AVATAR-BAUKASTEN EDITOR -->
+                <section id="screen-avatar-editor" class="view-screen">
+                    <h2 class="screen-title">✦ 8-BIT AVATAR EDITOR ✦</h2>
+                    
+                    <div class="editor-layout">
+                        <div class="preview-area">
+                            <canvas id="avatar-canvas" width="64" height="64"></canvas>
+                            <span class="preview-label">LIVE-VORSCHAU (64x64)</span>
+                        </div>
+
+                        <div class="controls-area">
+                            <div class="form-group">
+                                <label>Hautton / Teint:</label>
+                                <select id="layer-skin" class="input-field" onchange="renderCustomAvatar()">
+                                    <option value="pale">Ethereal Pale (Blass)</option>
+                                    <option value="ghost">Ghost White (Geisterweiß)</option>
+                                    <option value="cyber">Cyber Slate (Schiefergrau)</option>
+                                    <option value="warm">Dusk Tone (Dunkel)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Frisur:</label>
+                                <select id="layer-hair" class="input-field" onchange="renderCustomAvatar()">
+                                    <option value="trad">Trad-Goth (Teased Hair)</option>
+                                    <option value="postpunk">Post-Punk (Asym Bob)</option>
+                                    <option value="spikes">Deathrock (Spikes / Iro)</option>
+                                    <option value="cyberdreads">Cybergoth (Dreadfalls)</option>
+                                    <option value="buzz">EBM (Buzzcut)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Augen & Makeup:</label>
+                                <select id="layer-eyes" class="input-field" onchange="renderCustomAvatar()">
+                                    <option value="heavy">Heavy Winged Eyeliner</option>
+                                    <option value="cateye">Cat-Eye Makeup</option>
+                                    <option value="smudge">Smudged Goth Makeup</option>
+                                    <option value="visor">Cyber LED Visor</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Mund / Lippen:</label>
+                                <select id="layer-mouth" class="input-field" onchange="renderCustomAvatar()">
+                                    <option value="black">Black Lipstick</option>
+                                    <option value="pale">Pale Lips</option>
+                                    <option value="piercing">Lip Piercing</option>
+                                    <option value="mask">Respirator / Maske</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Accessoire:</label>
+                                <select id="layer-acc" class="input-field" onchange="renderCustomAvatar()">
+                                    <option value="none">Keines</option>
+                                    <option value="choker">Spiked Choker</option>
+                                    <option value="sunglasses">Oval Dark Glasses</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="editor-buttons">
+                        <button class="btn btn-primary" onclick="saveCustomAvatar()">AVATAR SPEICHERN & ÜBERNEHMEN</button>
+                        <button class="btn btn-secondary" onclick="switchScreen('screen-dashboard')">⬅ ZURÜCK ZUM DASHBOARD</button>
+                    </div>
                 </section>
 
             </main>
