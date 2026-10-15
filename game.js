@@ -11,24 +11,10 @@ const SUBGENRES_DATA = [
     { id: "new_wave", name: "New-Wave" }
 ];
 
-const AVATARS_DATA = [
-    { id: "trad_goth_f", label: "Trad-Goth F", src: "assets/images/avatars/trad_goth_f.png" },
-    { id: "darkwave_f", label: "Darkwave F", src: "assets/images/avatars/darkwave_f.png" },
-    { id: "cybergoth_f", label: "Cybergoth F", src: "assets/images/avatars/cybergoth_f.png" },
-    { id: "deathrock_f", label: "Deathrock F", src: "assets/images/avatars/deathrock_f.png" },
-    { id: "ethereal_f", label: "Ethereal F", src: "assets/images/avatars/ethereal_f.png" },
-    { id: "post_punk_m", label: "Post-Punk M", src: "assets/images/avatars/post_punk_m.png" },
-    { id: "ebm_m", label: "EBM M", src: "assets/images/avatars/ebm_m.png" },
-    { id: "goth_rock_m", label: "Goth-Rock M", src: "assets/images/avatars/goth_rock_m.png" },
-    { id: "aggrotech_m", label: "Aggrotech M", src: "assets/images/avatars/aggrotech_m.png" },
-    { id: "new_wave_m", label: "New-Wave M", src: "assets/images/avatars/new_wave_m.png" }
-];
-
 let gameState = {
     setupComplete: false,
     djName: "",
     mainGenre: "",
-    avatarSrc: "",
     day: 2,
     month: 10,
     year: 2026,
@@ -41,9 +27,11 @@ let gameState = {
 
 document.addEventListener("DOMContentLoaded", () => {
     initSubgenreDropdown();
-    initAvatarPicker();
     renderSetlistEditor();
-    renderCustomAvatar();
+    
+    // Initial den Baukasten und den Profilkasten rendern
+    renderCustomAvatar(); 
+
     updateUI();
 });
 
@@ -59,36 +47,6 @@ function initSubgenreDropdown() {
     });
 }
 
-function initAvatarPicker() {
-    const picker = document.getElementById("avatar-picker");
-    if (!picker) return;
-    picker.innerHTML = "";
-
-    AVATARS_DATA.forEach((avatar, index) => {
-        const div = document.createElement("div");
-        div.className = `avatar-option ${index === 0 ? 'selected' : ''}`;
-        div.dataset.src = avatar.src;
-        div.onclick = function() { selectAvatar(this); };
-
-        const img = document.createElement("img");
-        img.src = avatar.src;
-        img.alt = avatar.label;
-        img.onerror = function() { this.style.opacity = '0.2'; };
-
-        const span = document.createElement("span");
-        span.textContent = avatar.label;
-
-        div.appendChild(img);
-        div.appendChild(span);
-        picker.appendChild(div);
-    });
-}
-
-function selectAvatar(element) {
-    document.querySelectorAll(".avatar-option").forEach(el => el.classList.remove("selected"));
-    element.classList.add("selected");
-}
-
 function finishCharacterSetup() {
     let nameInput = document.getElementById("dj-name").value.trim();
     if (!nameInput) {
@@ -96,27 +54,30 @@ function finishCharacterSetup() {
         return;
     }
     
-    // Präfix "DJ " nur hinzufügen, falls der Spieler es nicht selbst eingegeben hat
     if (!nameInput.toLowerCase().startsWith("dj ")) {
         nameInput = "DJ " + nameInput;
     }
 
-    const selectedAvatar = document.querySelector(".avatar-option.selected");
-    
     gameState.djName = nameInput;
     gameState.mainGenre = document.getElementById("main-genre-select").value;
-    gameState.avatarSrc = selectedAvatar ? selectedAvatar.dataset.src : AVATARS_DATA[0].src;
+    
+    const isFirstTime = !gameState.setupComplete;
     gameState.setupComplete = true;
 
-    const avatarImg = document.getElementById("current-avatar");
-    if (avatarImg) avatarImg.src = gameState.avatarSrc;
+    // Profil-Canvas im linken Rack aktualisieren
+    drawCanvasTo("profile-canvas-fallback");
 
     document.getElementById("name-display").innerText = gameState.djName;
     
     const genreObj = SUBGENRES_DATA.find(g => g.id === gameState.mainGenre);
     document.getElementById("main-genre-display").innerText = genreObj ? genreObj.name : gameState.mainGenre;
 
-    addLog(`Karriere gestartet! ${gameState.djName} betritt den Untergrund.`);
+    if (isFirstTime) {
+        addLog(`Karriere gestartet! ${gameState.djName} betritt den Untergrund.`);
+    } else {
+        addLog(`${gameState.djName} hat sein Profil & Avatar angepasst.`);
+    }
+
     switchScreen("screen-dashboard");
     updateUI();
 }
@@ -212,12 +173,13 @@ function renderSetlistEditor() {
     }
 }
 
-// CANVAS RENDER ENGINE (PURE JS 8-BIT GENERATOR)
+// CANVAS GENERATOR LOGIK (8-BIT BAUKASTEN)
 function renderCustomAvatar() {
     const canvas = document.getElementById("avatar-canvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
 
+    // Hintergrund
     ctx.fillStyle = "#08080c";
     ctx.fillRect(0, 0, 64, 64);
 
@@ -227,15 +189,17 @@ function renderCustomAvatar() {
     const mouthType = document.getElementById("layer-mouth")?.value || "black";
     const accType = document.getElementById("layer-acc")?.value || "none";
 
-    // 1. SKIN / HEAD BASE
+    // 1. KOPF & HAUT
     let skinColors = { pale: "#dcdce6", ghost: "#ffffff", cyber: "#6c757d", warm: "#5a4d41" };
     ctx.fillStyle = skinColors[skinType] || "#dcdce6";
-    ctx.fillRect(18, 16, 28, 34);
-    ctx.fillRect(26, 50, 12, 10);
+    ctx.fillRect(18, 16, 28, 34); // Kopf
+    ctx.fillRect(26, 50, 12, 10); // Hals
 
+    // Kinn Schatten
     ctx.fillStyle = "rgba(0,0,0,0.25)";
     ctx.fillRect(18, 42, 28, 8);
 
+    // Kleidung
     ctx.fillStyle = "#121216";
     ctx.fillRect(12, 58, 40, 6);
 
@@ -264,7 +228,7 @@ function renderCustomAvatar() {
         ctx.fillRect(28, 42, 8, 2);
     }
 
-    // 4. HAAR-STILE
+    // 4. HAAR
     ctx.fillStyle = "#050508";
     if (hairType === "trad") {
         ctx.fillRect(12, 6, 40, 14);
@@ -293,25 +257,17 @@ function renderCustomAvatar() {
         ctx.fillStyle = "#00f3ff";
         ctx.fillRect(31, 52, 2, 3);
     }
+
+    // Live auf das Profil-Canvas kopieren
+    drawCanvasTo("profile-canvas-fallback");
 }
 
-// AVATAR SPEICHERN
-function saveCustomAvatar() {
-    const canvas = document.getElementById("avatar-canvas");
-    if (!canvas) return;
-    
-    const dataUrl = canvas.toDataURL("image/png");
-    gameState.avatarSrc = dataUrl;
-    
-    const avatarImg = document.getElementById("current-avatar");
-    if (avatarImg) {
-        avatarImg.src = dataUrl;
-        avatarImg.style.opacity = "1";
-    }
-
-    addLog("Neues 8-Bit Profilbild im Baukasten erstellt & gespeichert!");
-    switchScreen("screen-dashboard");
-    updateUI();
+function drawCanvasTo(targetCanvasId) {
+    const srcCanvas = document.getElementById("avatar-canvas");
+    const targetCanvas = document.getElementById(targetCanvasId);
+    if (!srcCanvas || !targetCanvas) return;
+    const targetCtx = targetCanvas.getContext("2d");
+    targetCtx.drawImage(srcCanvas, 0, 0);
 }
 
 function updateUI() {
