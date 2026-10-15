@@ -1,14 +1,8 @@
 const SUBGENRES_DATA = [
-    { id: "trad_goth", name: "Trad-Goth" },
+    { id: "batcave", name: "Batcave" },
     { id: "darkwave", name: "Darkwave" },
-    { id: "cybergoth", name: "Cybergoth" },
-    { id: "deathrock", name: "Deathrock" },
-    { id: "ethereal", name: "Ethereal Wave" },
-    { id: "post_punk", name: "Post-Punk" },
-    { id: "ebm", name: "EBM / Industrial" },
-    { id: "goth_rock", name: "Goth-Rock" },
-    { id: "aggrotech", name: "Aggrotech" },
-    { id: "new_wave", name: "New-Wave" }
+    { id: "ebm_industrial", name: "EBM / Industrial" },
+    { id: "synthpop", name: "Synthpop / New Wave" }
 ];
 
 let gameState = {
