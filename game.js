@@ -90,12 +90,17 @@ function selectAvatar(element) {
 }
 
 function finishCharacterSetup() {
-    const nameInput = document.getElementById("dj-name").value.trim();
+    let nameInput = document.getElementById("dj-name").value.trim();
     if (!nameInput) {
         alert("Bitte gib einen DJ-Namen ein!");
         return;
     }
     
+    // Präfix "DJ " nur hinzufügen, falls der Spieler es nicht selbst eingegeben hat
+    if (!nameInput.toLowerCase().startsWith("dj ")) {
+        nameInput = "DJ " + nameInput;
+    }
+
     const selectedAvatar = document.querySelector(".avatar-option.selected");
     
     gameState.djName = nameInput;
@@ -111,7 +116,7 @@ function finishCharacterSetup() {
     const genreObj = SUBGENRES_DATA.find(g => g.id === gameState.mainGenre);
     document.getElementById("main-genre-display").innerText = genreObj ? genreObj.name : gameState.mainGenre;
 
-    addLog(`Karriere gestartet! DJ ${gameState.djName} betritt den Untergrund.`);
+    addLog(`Karriere gestartet! ${gameState.djName} betritt den Untergrund.`);
     switchScreen("screen-dashboard");
     updateUI();
 }
