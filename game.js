@@ -312,9 +312,10 @@ function renderCustomAvatar() {
         }
     }
 
-    // 7. HAAR-STILE (TRAD-GOTH SPIKES & REFLIXE)
+    // 7. HAAR-STILE (ALLE FRISUREN VOLLSTÄNDIG)
     ctx.fillStyle = cHair;
     if (hairType === "trad") {
+        // Toupierte Mähne / Spikes
         ctx.fillRect(32, 14, 64, 26);
         ctx.fillRect(24, 26, 80, 20);
 
@@ -337,18 +338,51 @@ function renderCustomAvatar() {
             ctx.fillRect(104, 40, 4, 16);
         }
     } else if (hairType === "postpunk") {
+        // Asymmetrischer Bob (lang auf einer Seite, kurz auf der anderen)
         ctx.fillRect(32, 18, 64, 20);
-        ctx.fillRect(24, 38, 30, 52);
-        ctx.fillRect(84, 38, 12, 18);
+        ctx.fillRect(24, 38, 28, 56); // Lange Seite links
+        ctx.fillRect(84, 38, 14, 18); // Kurze Seite rechts
+        ctx.fillRect(36, 24, 20, 32); // Schräger Pony über der Stirn
+        
+        if (hairColor === "black") {
+            ctx.fillStyle = "#2a2a3a";
+            ctx.fillRect(28, 42, 6, 30);
+        }
     } else if (hairType === "spikes") {
-        ctx.fillRect(56, 4, 16, 36);
-        ctx.fillRect(50, 12, 28, 28);
+        // Hoher Irokesen / Deathhawk
+        ctx.fillRect(56, 2, 16, 38);
+        ctx.fillRect(50, 10, 28, 30);
+        ctx.fillRect(44, 18, 40, 22);
+        
+        // Seitlich rasierte Stoppeln
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
+        ctx.fillRect(36, 36, 12, 24);
+        ctx.fillRect(80, 36, 12, 24);
     } else if (hairType === "cyberdreads") {
+        // Dreadlocks / Falls (Lange Stränge zu beiden Seiten)
         ctx.fillRect(38, 20, 52, 18);
-        ctx.fillRect(22, 30, 14, 70);
-        ctx.fillRect(92, 30, 14, 70);
+        
+        // Rechte & linke Dreads
+        ctx.fillRect(20, 30, 16, 72);
+        ctx.fillRect(92, 30, 16, 72);
+        ctx.fillRect(12, 42, 12, 54);
+        ctx.fillRect(104, 42, 12, 54);
+        
+        // Riffel-Muster für Dreads
+        ctx.fillStyle = "rgba(255,255,255,0.2)";
+        for (let y = 34; y < 98; y += 8) {
+            ctx.fillRect(22, y, 12, 2);
+            ctx.fillRect(94, y, 12, 2);
+        }
     } else if (hairType === "buzz") {
-        ctx.fillRect(38, 30, 52, 8);
+        // Buzzcut / Undercut (Kompakter Haaransatz)
+        ctx.fillRect(38, 30, 52, 10);
+        ctx.fillRect(36, 34, 56, 8);
+        
+        // Seiten-Schatten
+        ctx.fillStyle = "rgba(0,0,0,0.2)";
+        ctx.fillRect(36, 40, 8, 16);
+        ctx.fillRect(84, 40, 8, 16);
     }
 
     // 8. ACCESSOIRES
