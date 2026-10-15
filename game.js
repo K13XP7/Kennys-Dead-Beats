@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initSubgenreDropdown();
     initAvatarPicker();
     renderSetlistEditor();
+    renderCustomAvatar();
     updateUI();
 });
 
@@ -53,7 +54,7 @@ function initSubgenreDropdown() {
     SUBGENRES_DATA.forEach(genre => {
         const opt = document.createElement("option");
         opt.value = genre.id;
-        opt.textContent = genre.name; // Nur der reine Name ohne Zusatz!
+        opt.textContent = genre.name;
         select.appendChild(opt);
     });
 }
@@ -102,7 +103,9 @@ function finishCharacterSetup() {
     gameState.avatarSrc = selectedAvatar ? selectedAvatar.dataset.src : AVATARS_DATA[0].src;
     gameState.setupComplete = true;
 
-    document.getElementById("current-avatar").src = gameState.avatarSrc;
+    const avatarImg = document.getElementById("current-avatar");
+    if (avatarImg) avatarImg.src = gameState.avatarSrc;
+
     document.getElementById("name-display").innerText = gameState.djName;
     
     const genreObj = SUBGENRES_DATA.find(g => g.id === gameState.mainGenre);
@@ -202,6 +205,108 @@ function renderSetlistEditor() {
         slot.appendChild(select);
         container.appendChild(slot);
     }
+}
+
+// CANVAS RENDER ENGINE (PURE JS 8-BIT GENERATOR)
+function renderCustomAvatar() {
+    const canvas = document.getElementById("avatar-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#08080c";
+    ctx.fillRect(0, 0, 64, 64);
+
+    const skinType = document.getElementById("layer-skin")?.value || "pale";
+    const hairType = document.getElementById("layer-hair")?.value || "trad";
+    const eyesType = document.getElementById("layer-eyes")?.value || "heavy";
+    const mouthType = document.getElementById("layer-mouth")?.value || "black";
+    const accType = document.getElementById("layer-acc")?.value || "none";
+
+    // 1. SKIN / HEAD BASE
+    let skinColors = { pale: "#dcdce6", ghost: "#ffffff", cyber: "#6c757d", warm: "#5a4d41" };
+    ctx.fillStyle = skinColors[skinType] || "#dcdce6";
+    ctx.fillRect(18, 16, 28, 34);
+    ctx.fillRect(26, 50, 12, 10);
+
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    ctx.fillRect(18, 42, 28, 8);
+
+    ctx.fillStyle = "#121216";
+    ctx.fillRect(12, 58, 40, 6);
+
+    // 2. AUGEN / MAKEUP
+    ctx.fillStyle = "#000000";
+    if (eyesType === "heavy") {
+        ctx.fillRect(22, 28, 8, 4);
+        ctx.fillRect(34, 28, 8, 4);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(25, 29, 2, 2);
+        ctx.fillRect(37, 29, 2, 2);
+    } else if (eyesType === "visor") {
+        ctx.fillStyle = "#00f3ff";
+        ctx.fillRect(20, 27, 24, 6);
+    } else {
+        ctx.fillRect(23, 29, 6, 3);
+        ctx.fillRect(35, 29, 6, 3);
+    }
+
+    // 3. MUND / LIPPEN
+    ctx.fillStyle = mouthType === "black" ? "#000000" : "#8a2be2";
+    if (mouthType === "mask") {
+        ctx.fillStyle = "#1a1a24";
+        ctx.fillRect(20, 38, 24, 12);
+    } else {
+        ctx.fillRect(28, 42, 8, 2);
+    }
+
+    // 4. HAAR-STILE
+    ctx.fillStyle = "#050508";
+    if (hairType === "trad") {
+        ctx.fillRect(12, 6, 40, 14);
+        ctx.fillRect(10, 16, 10, 28);
+        ctx.fillRect(44, 16, 10, 28);
+    } else if (hairType === "spikes") {
+        ctx.fillRect(26, 4, 12, 14);
+        ctx.fillRect(24, 8, 16, 10);
+    } else if (hairType === "cyberdreads") {
+        ctx.fillStyle = "#8a2be2";
+        ctx.fillRect(12, 12, 8, 40);
+        ctx.fillRect(44, 12, 8, 40);
+        ctx.fillStyle = "#050508";
+        ctx.fillRect(20, 10, 24, 10);
+    }
+
+    // 5. ACCESSOIRES
+    if (accType === "sunglasses") {
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(20, 26, 24, 7);
+        ctx.fillStyle = "#8a2be2";
+        ctx.fillRect(21, 27, 2, 2);
+    } else if (accType === "choker") {
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(26, 52, 12, 3);
+        ctx.fillStyle = "#00f3ff";
+        ctx.fillRect(31, 52, 2, 3);
+    }
+}
+
+// AVATAR SPEICHERN
+function saveCustomAvatar() {
+    const canvas = document.getElementById("avatar-canvas");
+    if (!canvas) return;
+    
+    const dataUrl = canvas.toDataURL("image/png");
+    gameState.avatarSrc = dataUrl;
+    
+    const avatarImg = document.getElementById("current-avatar");
+    if (avatarImg) {
+        avatarImg.src = dataUrl;
+        avatarImg.style.opacity = "1";
+    }
+
+    addLog("Neues 8-Bit Profilbild im Baukasten erstellt & gespeichert!");
+    switchScreen("screen-dashboard");
+    updateUI();
 }
 
 function updateUI() {
