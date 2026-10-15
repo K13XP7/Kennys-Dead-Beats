@@ -239,4 +239,154 @@ function renderCustomAvatar() {
         ctx.fillRect(46, 64, 2, 12);
         ctx.fillRect(50, 64, 2, 12);
     } else if (detailType === "bat") {
-        ctx.fillStyle = "#000000
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(44, 72, 10, 4);
+        ctx.fillRect(47, 70, 4, 8);
+    } else if (detailType === "piercings") {
+        ctx.fillStyle = "#00f3ff";
+        ctx.fillRect(44, 74, 3, 3);
+        ctx.fillRect(81, 74, 3, 3);
+    }
+
+    // 4. AUGENBRAUEN
+    ctx.fillStyle = cHair;
+    if (browsType === "arch") {
+        ctx.fillRect(46, 48, 12, 2);
+        ctx.fillRect(70, 48, 12, 2);
+        ctx.fillRect(56, 50, 2, 2);
+        ctx.fillRect(70, 50, 2, 2);
+    } else if (browsType === "pierced") {
+        ctx.fillRect(46, 50, 12, 3);
+        ctx.fillRect(70, 50, 12, 3);
+        ctx.fillStyle = "#00f3ff";
+        ctx.fillRect(52, 49, 3, 5);
+    } else if (browsType === "heavy") {
+        ctx.fillRect(44, 50, 14, 3);
+        ctx.fillRect(70, 50, 14, 3);
+    }
+
+    // 5. AUGEN / MAKEUP
+    ctx.fillStyle = "#000000";
+    if (eyesType === "heavy") {
+        ctx.fillRect(46, 56, 12, 6);
+        ctx.fillRect(70, 56, 12, 6);
+        ctx.fillRect(42, 54, 6, 4);
+        ctx.fillRect(80, 54, 6, 4);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(50, 58, 4, 4);
+        ctx.fillRect(74, 58, 4, 4);
+    } else if (eyesType === "cateye") {
+        ctx.fillRect(44, 54, 16, 10);
+        ctx.fillRect(68, 54, 16, 10);
+        ctx.fillStyle = "#8a2be2";
+        ctx.fillRect(46, 56, 12, 6);
+        ctx.fillRect(70, 56, 12, 6);
+    } else if (eyesType === "smudge") {
+        ctx.fillRect(46, 56, 12, 6);
+        ctx.fillRect(70, 56, 12, 6);
+        ctx.fillRect(48, 62, 2, 8);
+        ctx.fillRect(54, 62, 2, 12);
+        ctx.fillRect(72, 62, 2, 10);
+        ctx.fillRect(78, 62, 2, 6);
+    } else if (eyesType === "visor") {
+        ctx.fillStyle = "#00f3ff";
+        ctx.fillRect(40, 54, 48, 10);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(44, 56, 40, 2);
+    }
+
+    // 6. MUND & LIPPEN
+    if (mouthType === "mask") {
+        ctx.fillStyle = "#1a1a24";
+        ctx.fillRect(46, 72, 36, 20);
+        ctx.fillStyle = "#00f3ff";
+        ctx.fillRect(60, 78, 8, 8);
+    } else {
+        ctx.fillStyle = mouthType === "purple" ? "#8a2be2" : (mouthType === "black" ? "#000000" : "#d090a0");
+        ctx.fillRect(56, 78, 16, 4);
+        ctx.fillRect(58, 82, 12, 2);
+        if (mouthType === "piercing") {
+            ctx.fillStyle = "#00f3ff";
+            ctx.fillRect(54, 84, 2, 3);
+            ctx.fillRect(72, 84, 2, 3);
+        }
+    }
+
+    // 7. HAAR-STILE (TRAD-GOTH SPIKES & REFLIXE)
+    ctx.fillStyle = cHair;
+    if (hairType === "trad") {
+        ctx.fillRect(32, 14, 64, 26);
+        ctx.fillRect(24, 26, 80, 20);
+
+        const spikes = [
+            [28, 8, 8, 10], [40, 4, 10, 14], [54, 0, 12, 18], 
+            [68, 2, 10, 16], [82, 6, 8, 12]
+        ];
+        spikes.forEach(([x, y, w, h]) => ctx.fillRect(x, y, w, h));
+
+        ctx.fillRect(16, 32, 18, 48);
+        ctx.fillRect(94, 32, 18, 48);
+        ctx.fillRect(12, 44, 12, 28);
+        ctx.fillRect(104, 44, 12, 28);
+
+        if (hairColor === "black") {
+            ctx.fillStyle = "#2a2a3a";
+            ctx.fillRect(36, 20, 20, 4);
+            ctx.fillRect(68, 22, 20, 4);
+            ctx.fillRect(20, 40, 4, 16);
+            ctx.fillRect(104, 40, 4, 16);
+        }
+    } else if (hairType === "postpunk") {
+        ctx.fillRect(32, 18, 64, 20);
+        ctx.fillRect(24, 38, 30, 52);
+        ctx.fillRect(84, 38, 12, 18);
+    } else if (hairType === "spikes") {
+        ctx.fillRect(56, 4, 16, 36);
+        ctx.fillRect(50, 12, 28, 28);
+    } else if (hairType === "cyberdreads") {
+        ctx.fillRect(38, 20, 52, 18);
+        ctx.fillRect(22, 30, 14, 70);
+        ctx.fillRect(92, 30, 14, 70);
+    } else if (hairType === "buzz") {
+        ctx.fillRect(38, 30, 52, 8);
+    }
+
+    // 8. ACCESSOIRES
+    if (accType === "sunglasses") {
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(40, 52, 48, 12);
+        ctx.fillStyle = "#8a2be2";
+        ctx.fillRect(42, 54, 4, 3);
+    } else if (accType === "choker") {
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(56, 94, 16, 6);
+        ctx.fillStyle = "#00f3ff";
+        ctx.fillRect(62, 94, 4, 6);
+    } else if (accType === "tiara") {
+        ctx.fillStyle = "#8a2be2";
+        ctx.fillRect(48, 26, 32, 3);
+        ctx.fillRect(52, 20, 4, 6);
+        ctx.fillRect(62, 16, 4, 10);
+        ctx.fillRect(72, 20, 4, 6);
+    }
+
+    drawCanvasTo("profile-canvas-fallback");
+}
+
+function drawCanvasTo(targetCanvasId) {
+    const srcCanvas = document.getElementById("avatar-canvas");
+    const targetCanvas = document.getElementById(targetCanvasId);
+    if (!srcCanvas || !targetCanvas) return;
+    const targetCtx = targetCanvas.getContext("2d");
+    targetCtx.drawImage(srcCanvas, 0, 0);
+}
+
+function updateUI() {
+    document.getElementById("date-display").innerText = getFormattedDate();
+    document.getElementById("cash-display").innerText = gameState.cash;
+    document.getElementById("rep-display").innerText = gameState.rep;
+    document.getElementById("skill-display").innerText = gameState.skill;
+    
+    document.getElementById("energy-text").innerText = `${gameState.energy}%`;
+    document.getElementById("energy-bar").style.width = `${gameState.energy}%`;
+}
