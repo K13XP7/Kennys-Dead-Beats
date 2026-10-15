@@ -53,7 +53,7 @@ function initSubgenreDropdown() {
     SUBGENRES_DATA.forEach(genre => {
         const opt = document.createElement("option");
         opt.value = genre.id;
-        opt.textContent = genre.name;
+        opt.textContent = genre.name; // Nur der reine Name ohne Zusatz!
         select.appendChild(opt);
     });
 }
