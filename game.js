@@ -1,6 +1,7 @@
 const SUBGENRES_DATA = [
     { id: "batcave", name: "Batcave" },
     { id: "darkwave", name: "Darkwave" },
+    { id: "minimal_ndw", name: "Minimal Wave / NDW" },
     { id: "ebm_industrial", name: "EBM / Industrial" },
     { id: "synthpop", name: "Synthpop / New Wave" }
 ];
