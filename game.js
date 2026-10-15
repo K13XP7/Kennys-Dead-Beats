@@ -334,26 +334,25 @@ function renderCustomAvatar() {
         }
     }
 
-    // 8. HAAR-STILE
+// 8. HAAR-STILE (Trad-Goth neu: Zackig & Toupierte 80s-Spikes)
     ctx.fillStyle = cHair;
     if (hairType === "trad") {
-        ctx.fillRect(16, 6, 96, 34);
-        ctx.fillRect(12, 30, 26, 60);
-        ctx.fillRect(90, 30, 26, 60);
-    } else if (hairType === "postpunk") {
-        ctx.fillRect(32, 16, 64, 22);
-        ctx.fillRect(24, 38, 30, 60);
-        ctx.fillRect(84, 38, 12, 20);
-    } else if (hairType === "spikes") {
-        ctx.fillRect(54, 2, 20, 36);
-        ctx.fillRect(50, 10, 28, 24);
-        ctx.fillRect(46, 18, 36, 16);
-    } else if (hairType === "cyberdreads") {
-        ctx.fillRect(36, 16, 56, 18);
-        ctx.fillRect(20, 30, 16, 80);
-        ctx.fillRect(92, 30, 16, 80);
-    } else if (hairType === "buzz") {
-        ctx.fillRect(38, 26, 52, 10);
+        // Haupthaar-Volumen oben
+        ctx.fillRect(20, 10, 88, 20);
+        
+        // Zackige Spikes nach oben & zu den Seiten
+        ctx.fillRect(28, 4, 16, 12);
+        ctx.fillRect(52, 2, 24, 14);
+        ctx.fillRect(84, 4, 16, 12);
+        
+        // Wilde seitliche Strähnen (keine runde Afro-Kugel mehr!)
+        ctx.fillRect(12, 20, 20, 16);
+        ctx.fillRect(8, 32, 20, 36);
+        ctx.fillRect(16, 64, 16, 28);
+
+        ctx.fillRect(96, 20, 20, 16);
+        ctx.fillRect(100, 32, 20, 36);
+        ctx.fillRect(96, 64, 16, 28);
     }
 
     // 9. ACCESSOIRES
