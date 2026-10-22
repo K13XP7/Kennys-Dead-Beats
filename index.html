@@ -1,509 +1,291 @@
-const SUBGENRES_DATA = [
-    { id: "batcave", name: "Batcave" },
-    { id: "darkwave", name: "Darkwave" },
-    { id: "minimal_ndw", name: "Minimal Wave / NDW" },
-    { id: "ebm_industrial", name: "EBM / Industrial" },
-    { id: "synthpop", name: "Synthpop / New Wave" }
-];
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kennys Dead Beats - Goth DJ Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
 
-let gameState = {
-    setupComplete: false,
-    djName: "",
-    mainGenre: "",
-    day: 2,
-    month: 10,
-    year: 2026,
-    cash: 300,
-    rep: 0,
-    skill: 10,
-    energy: 100,
-    setlist: new Array(10).fill("batcave"), // Reduziert auf 10 Slots!
-    mails: [],
-    bookedGig: null
-};
-
-// INITIALE GIG-ANFRAGEN (MAILS)
-const INITIAL_MAILS = [
-    {
-        id: "m1",
-        sender: "Viktor (Klub Katakombe)",
-        subject: "DJ-Anfrage: Kälte & Synthesizer",
-        date: "02. OKT 2026",
-        read: false,
-        text: "Hallo! Wir suchen für diesen Samstag einen DJ für unsere 'Kälte & Synthesizer'-Nacht. Das Publikum erwartet eine düstere, synthetische Atmosphäre mit kühlen Melodien. Bist du dabei?",
-        pay: 120,
-        repReward: 15,
-        targetGenres: { darkwave: 0.5, minimal_ndw: 0.5 },
-        dislikedGenres: ["ebm_industrial"]
-    },
-    {
-        id: "m2",
-        sender: "Lady Pest (The Vault)",
-        subject: "Gig: Batcave & Oldschool Deathrock",
-        date: "02. OKT 2026",
-        read: false,
-        text: "Hey! Bei uns im Vault steigt diesen Monat die Rituell-Nacht. Wir wollen echten 80s Batcave und rotzigen Post-Punk hören. Lass die Synthesizer lieber daheim!",
-        pay: 150,
-        repReward: 20,
-        targetGenres: { batcave: 0.8, synthpop: 0.2 },
-        dislikedGenres: ["ebm_industrial", "minimal_ndw"]
-    }
-];
-
-document.addEventListener("DOMContentLoaded", () => {
-    gameState.mails = [...INITIAL_MAILS];
-    initSubgenreDropdown();
-    renderSetlistEditor();
-    renderCustomAvatar(); 
-    updateUI();
-});
-
-function initSubgenreDropdown() {
-    const select = document.getElementById("main-genre-select");
-    if (!select) return;
-    select.innerHTML = "";
-    SUBGENRES_DATA.forEach(genre => {
-        const opt = document.createElement("option");
-        opt.value = genre.id;
-        opt.textContent = genre.name;
-        select.appendChild(opt);
-    });
-}
-
-function finishCharacterSetup() {
-    let nameInput = document.getElementById("dj-name").value.trim();
-    if (!nameInput) {
-        alert("Bitte gib einen DJ-Namen ein!");
-        return;
-    }
-    
-    if (!nameInput.toLowerCase().startsWith("dj ")) {
-        nameInput = "DJ " + nameInput;
-    }
-
-    gameState.djName = nameInput;
-    gameState.mainGenre = document.getElementById("main-genre-select").value;
-    
-    const isFirstTime = !gameState.setupComplete;
-    gameState.setupComplete = true;
-
-    renderCustomAvatar();
-
-    document.getElementById("name-display").innerText = gameState.djName;
-    document.getElementById("terminal-nav").style.display = "flex";
-    
-    const genreObj = SUBGENRES_DATA.find(g => g.id === gameState.mainGenre);
-    document.getElementById("main-genre-display").innerText = genreObj ? genreObj.name : gameState.mainGenre;
-
-    if (isFirstTime) {
-        addLog(`Karriere gestartet! ${gameState.djName} betritt den Untergrund.`);
-    } else {
-        addLog(`${gameState.djName} hat sein Profil & Avatar angepasst.`);
-    }
-
-    switchScreen("screen-inbox");
-    renderInbox();
-    updateUI();
-}
-
-function switchScreen(screenId) {
-    document.querySelectorAll(".view-screen").forEach(screen => {
-        screen.classList.remove("active");
-    });
-    const target = document.getElementById(screenId);
-    if (target) {
-        target.classList.add("active");
-    }
-
-    document.querySelectorAll(".nav-btn").forEach(btn => {
-        btn.classList.remove("active");
-        if (btn.getAttribute("onclick")?.includes(screenId)) {
-            btn.classList.add("active");
-        }
-    });
-
-    if (screenId === "screen-inbox") renderInbox();
-}
-
-function renderInbox() {
-    const tbody = document.getElementById("mail-list-body");
-    if (!tbody) return;
-    tbody.innerHTML = "";
-
-    gameState.mails.forEach(mail => {
-        const tr = document.createElement("tr");
-        tr.className = `mail-row ${!mail.read ? 'unread' : ''}`;
-        tr.onclick = () => readMail(mail.id);
-
-        tr.innerHTML = `
-            <td>${mail.sender}</td>
-            <td>${mail.subject}</td>
-            <td>${mail.date}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-function readMail(mailId) {
-    const mail = gameState.mails.find(m => m.id === mailId);
-    if (!mail) return;
-
-    mail.read = true;
-    renderInbox();
-
-    const reader = document.getElementById("mail-reader");
-    if (!reader) return;
-
-    const isBooked = gameState.bookedGig && gameState.bookedGig.id === mail.id;
-
-    reader.innerHTML = `
-        <div class="mail-header-info">
-            <div><strong>VON:</strong> ${mail.sender}</div>
-            <div><strong>BETREFF:</strong> ${mail.subject}</div>
-            <div><strong>GAGE:</strong> ${mail.pay} € | <strong>REP:</strong> +${mail.repReward}</div>
-        </div>
-        <div class="mail-body-text">
-            ${mail.text}
-        </div>
-        <div class="mail-actions">
-            ${isBooked 
-                ? `<span style="color:var(--accent-cyan)">[ GIG ANGENOMMEN ]</span>`
-                : `<button class="btn btn-primary" onclick="acceptGig('${mail.id}')">[ GIG ANNEHMEN ]</button>`
-            }
-        </div>
-    `;
-}
-
-function acceptGig(mailId) {
-    const mail = gameState.mails.find(m => m.id === mailId);
-    if (!mail) return;
-
-    gameState.bookedGig = mail;
-    addLog(`Gig angenommen: '${mail.subject}' bei ${mail.sender}`);
-    
-    updateBookedGigDisplay();
-    switchScreen("screen-dashboard");
-    updateUI();
-}
-
-function updateBookedGigDisplay() {
-    const box = document.getElementById("booked-gig-info");
-    const playBtn = document.getElementById("btn-play-gig");
-    if (!box) return;
-
-    if (gameState.bookedGig) {
-        box.innerHTML = `
-            <p><strong>${gameState.bookedGig.subject}</strong></p>
-            <p class="text-muted">${gameState.bookedGig.sender}</p>
-            <p style="color:var(--accent-cyan); margin-top:4px;">Gage: ${gameState.bookedGig.pay} €</p>
-        `;
-        if (playBtn) playBtn.style.display = "inline-block";
-    } else {
-        box.innerHTML = `<p class="text-muted">Kein Gig gebucht.</p>`;
-        if (playBtn) playBtn.style.display = "none";
-    }
-}
-
-// SETLIST EVALUATION & PERFORMANCE ENGINE (ANGEPASST AUF 10 SLOTS)
-function playBookedGig() {
-    if (!gameState.bookedGig) return;
-    if (gameState.energy < 30) {
-        addLog("Zu müde! Du brauchst mindestens 30% Energie für einen Gig.");
-        return;
-    }
-
-    const gig = gameState.bookedGig;
-    gameState.energy -= 30;
-
-    let genreCounts = {};
-    SUBGENRES_DATA.forEach(g => genreCounts[g.id] = 0);
-    gameState.setlist.forEach(g => {
-        if (genreCounts[g] !== undefined) genreCounts[g]++;
-    });
-
-    let totalScore = 0;
-    let comments = [];
-
-    // Erwartete Genres prüfen (auf Basis von 10 Tracks)
-    Object.keys(gig.targetGenres).forEach(gId => {
-        const ratio = (genreCounts[gId] || 0) / 10;
-        const targetRatio = gig.targetGenres[gId];
-        if (ratio >= targetRatio) {
-            totalScore += 40;
-        } else {
-            totalScore += Math.floor((ratio / targetRatio) * 30);
-        }
-    });
-
-    // Unerwünschte Genres prüfen (ab 2 Tracks Abzug)
-    gig.dislikedGenres.forEach(dId => {
-        if (genreCounts[dId] >= 2) {
-            totalScore -= 25;
-            const genreName = SUBGENRES_DATA.find(g => g.id === dId)?.name;
-            comments.push({
-                author: "Gästebuch-Eintrag (#42)",
-                text: `Eigentlich ein cooler Laden, aber warum spielt der DJ mitten im Set ${genreName}? Das hat die Stimmung ruiniert!`
-            });
-        }
-    });
-
-    // Hauptgenre Bonus (ab 2 Tracks im Hauptgenre)
-    if (genreCounts[gameState.mainGenre] >= 2) {
-        totalScore += 15;
-    }
-
-    let rating = "MÄSSIG";
-    if (totalScore >= 70) rating = "PERFEKT!";
-    else if (totalScore >= 45) rating = "SOLIDE";
-
-    if (totalScore >= 70) {
-        comments.push({
-            author: "Szene-Blog Review",
-            text: `${gameState.djName} hat den Club gerockt! Die Menge war absolut begeistert. Punktgenaue Trackauswahl!`
-        });
-    } else if (totalScore < 45 && comments.length === 0) {
-        comments.push({
-            author: "Clubgänger",
-            text: "War ganz okay, aber der Funke ist nicht wirklich übergesprungen..."
-        });
-    }
-
-    const finalCash = rating === "PERFEKT!" ? gig.pay + 30 : gig.pay;
-    const finalRep = rating === "PERFEKT!" ? gig.repReward + 5 : gig.repReward;
-
-    gameState.cash += finalCash;
-    gameState.rep += finalRep;
-    gameState.skill += 2;
-
-    addLog(`Gig absolviert! Ergebnis: ${rating} (+${finalCash}€, +${finalRep} Rep)`);
-
-    renderEvalScreen(gig, rating, totalScore, finalCash, finalRep, comments);
-    
-    gameState.bookedGig = null;
-    updateBookedGigDisplay();
-    switchScreen("screen-eval");
-    updateUI();
-}
-
-function renderEvalScreen(gig, rating, score, cash, rep, comments) {
-    const statsBox = document.getElementById("eval-stats");
-    const commentsBox = document.getElementById("eval-comments");
-
-    if (statsBox) {
-        statsBox.innerHTML = `
-            <div><strong>CLUB:</strong> ${gig.sender}</div>
-            <div><strong>BEWERTUNG:</strong> <span style="color:var(--accent-cyan)">${rating} (${score}/100 Pkt)</span></div>
-            <hr style="border-color:var(--border-color); margin:8px 0;">
-            <div><strong>GAGE ERHALTEN:</strong> +${cash} €</div>
-            <div><strong>REPUTATION:</strong> +${rep}</div>
-            <div><strong>SKILL:</strong> +2</div>
-        `;
-    }
-
-    if (commentsBox) {
-        commentsBox.innerHTML = "";
-        comments.forEach(c => {
-            const card = document.createElement("div");
-            card.className = "comment-card";
-            card.innerHTML = `
-                <div class="comment-author">💬 ${c.author}</div>
-                <div>"${c.text}"</div>
-            `;
-            commentsBox.appendChild(card);
-        });
-    }
-}
-
-function finishGigEvaluation() {
-    switchScreen("screen-inbox");
-}
-
-function buyEnergyDrink() {
-    if (gameState.energy >= 100) {
-        addLog("Du bist bereits voller Energie!");
-        return;
-    }
-    if (gameState.cash < 15) {
-        addLog("Nicht genug Geld für einen Energy-Drink!");
-        return;
-    }
-    gameState.cash -= 15;
-    gameState.energy = Math.min(100, gameState.energy + 25);
-    addLog("Energy-Drink getrunken: +25 Energie (-15 €)");
-    updateUI();
-}
-
-function nextDay() {
-    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    gameState.day += 1;
-    let maxDays = daysInMonth[gameState.month - 1] || 30;
-    
-    if (gameState.day > maxDays) {
-        gameState.day = 1;
-        gameState.month += 1;
-        if (gameState.month > 12) {
-            gameState.month = 1;
-            gameState.year += 1;
-        }
-    }
-    gameState.energy = Math.min(100, gameState.energy + 10);
-    addLog(`Neuer Tag angebrochen: ${getFormattedDate()}`);
-    updateUI();
-}
-
-function addLog(text) {
-    const container = document.getElementById("log-entries");
-    if (!container) return;
-    const entry = document.createElement("div");
-    entry.className = "log-item";
-    entry.innerHTML = `📜 <span class="date">[${getFormattedDate()}]</span> ${text}`;
-    container.prepend(entry);
-}
-
-function getFormattedDate() {
-    const months = ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"];
-    const d = String(gameState.day).padStart(2, "0");
-    const m = months[gameState.month - 1] || "OKT";
-    return `${d}. ${m} ${gameState.year}`;
-}
-
-function renderSetlistEditor() {
-    const container = document.getElementById("setlist-slots");
-    if (!container) return;
-    container.innerHTML = "";
-
-    for (let i = 0; i < gameState.setlist.length; i++) {
-        const slot = document.createElement("div");
-        slot.className = "slot-card";
+    <div class="terminal-container">
         
-        const slotNum = document.createElement("div");
-        slotNum.style.color = "var(--accent-cyan)";
-        slotNum.textContent = `#${i + 1}`;
+        <!-- LINKES STATUS-RACK -->
+        <aside class="side-rack left-rack">
+            <div class="rack-header">
+                <span class="rack-title">[ PROFIL ]</span>
+            </div>
+            
+            <div class="avatar-box">
+                <pre id="profile-ascii-display" class="ascii-art-container"></pre>
+            </div>
 
-        const select = document.createElement("select");
-        SUBGENRES_DATA.forEach(genre => {
-            const opt = document.createElement("option");
-            opt.value = genre.id;
-            opt.textContent = genre.name;
-            if (genre.id === gameState.setlist[i]) opt.selected = true;
-            select.appendChild(opt);
-        });
+            <div class="status-group">
+                <div class="stat-item">
+                    <span class="stat-label">NAME</span>
+                    <span id="name-display" class="stat-value">---</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">HAUPTGENRE</span>
+                    <span id="main-genre-display" class="stat-value">---</span>
+                </div>
+            </div>
 
-        select.onchange = (e) => {
-            gameState.setlist[i] = e.target.value;
-        };
+            <div class="rack-header">
+                <span class="rack-title">[ STATUS ]</span>
+            </div>
 
-        slot.appendChild(slotNum);
-        slot.appendChild(select);
-        container.appendChild(slot);
-    }
-}
+            <div class="status-group">
+                <div class="stat-item">
+                    <span class="stat-label">DATUM</span>
+                    <span id="date-display" class="stat-value">--.--.----</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">BARGELD</span>
+                    <span class="stat-value"><span id="cash-display">0</span> €</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">REPUTATION</span>
+                    <span id="rep-display" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">SKILL</span>
+                    <span id="skill-display" class="stat-value">0</span>
+                </div>
+            </div>
 
-// MONOCHROMER ASCII-AVATAR GENERATOR
-function renderCustomAvatar() {
-    const hairType = document.getElementById("layer-hair")?.value || "trad";
-    const browsType = document.getElementById("layer-brows")?.value || "heavy";
-    const eyesType = document.getElementById("layer-eyes")?.value || "heavy";
-    const mouthType = document.getElementById("layer-mouth")?.value || "black";
-    const accType = document.getElementById("layer-acc")?.value || "none";
+            <div class="rack-header">
+                <span class="rack-title">[ VITALWERTE ]</span>
+            </div>
 
-    let hairLines = [];
-    
-    if (hairType === "trad") {
-        hairLines = [
-            "    /\\ /\\  /\\ /\\ /\\    ",
-            "  /  \\/  \\/  \\/  \\/  \\  ",
-            " / /\\  /\\  /\\  /\\  /\\ \\ ",
-            "| |  \\/  \\/  \\/  \\/  | |",
-            "| |                  | |"
-        ];
-    } else if (hairType === "spikes") {
-        hairLines = [
-            "      /||\\  /||\\       ",
-            "     //||\\\\//||\\\\      ",
-            "    ///||||||||\\\\\\     ",
-            "   ////||||||||\\\\\\\\    ",
-            "  /////||||||||\\\\\\\\\\   "
-        ];
-    } else if (hairType === "postpunk") {
-        hairLines = [
-            "  .-----------------.  ",
-            " /  _________________\\ ",
-            "|  /                  |",
-            "| /                   |",
-            "|/                    |"
-        ];
-    } else if (hairType === "cyberdreads") {
-        hairLines = [
-            "  |||||||||||||||||||  ",
-            "  || | | | | | | | ||  ",
-            " ()(  | | | | | |  )() ",
-            " ()(              )() ",
-            " ()(              )() "
-        ];
-    } else {
-        hairLines = [
-            "                       ",
-            "   .---------------.   ",
-            "  ::: :: ::: ::: :::   ",
-            "  ::::::::::::::::::   ",
-            "  ::::::::::::::::::   "
-        ];
-    }
+            <div class="vital-group">
+                <div class="vital-label-row">
+                    <span>ENERGIE</span>
+                    <span id="energy-text">100%</span>
+                </div>
+                <div class="meter-bar">
+                    <div id="energy-bar" class="meter-fill" style="width: 100%;"></div>
+                </div>
+                <button class="btn btn-rack" onclick="buyEnergyDrink()">+[ MATE / DRINK ] (-15€)</button>
+            </div>
+        </aside>
 
-    let brows = "  |  :=:       :=:  |  ";
-    if (browsType === "arch") brows = "  |  /=\\       /=\\  |  ";
-    if (browsType === "pierced") brows = "  |  :=o       :=:  |  ";
-    if (browsType === "none") brows = "  |                 |  ";
+        <!-- MITTLERER HAUPTBEREICH -->
+        <main class="main-viewport">
+            
+            <!-- SYSTEM NAVIGATION TABS (NUR NACH SETUP SICHTBAR) -->
+            <nav id="terminal-nav" class="terminal-nav" style="display: none;">
+                <button class="nav-btn active" onclick="switchScreen('screen-inbox')">[ ✉ POSTEINGANG ]</button>
+                <button class="nav-btn" onclick="switchScreen('screen-dashboard')">[ 🎛 SETLIST EDITOR ]</button>
+                <button class="nav-btn" onclick="switchScreen('screen-setup')">[ 👤 PROFIL / AVATAR ]</button>
+            </nav>
 
-    let eyes = "  |  [o]       [o]  |  ";
-    if (eyesType === "heavy") eyes = "  | >[#]<     >[#]< |  ";
-    if (eyesType === "cateye") eyes = "  | /{#}\\     /{#}\\ |  ";
-    if (eyesType === "visor") eyes = "  | [==============]|  ";
+            <!-- SCREEN 1: CHARAKTERERSTELLUNG -->
+            <section id="screen-setup" class="view-screen active">
+                <div class="screen-header">
+                    <h2>◆ CHARAKTERERSTELLUNG ◆</h2>
+                </div>
 
-    if (accType === "sunglasses") eyes = "  |  [===]     [===]|  ";
+                <div class="setup-grid">
+                    <div class="setup-form">
+                        <div class="form-group">
+                            <label for="dj-name">DJ-Name:</label>
+                            <input type="text" id="dj-name" class="input-field" placeholder="z.B. Rotter" value="Rotter">
+                        </div>
 
-    let nose = "  |        ||       |  ";
+                        <div class="form-group">
+                            <label for="main-genre-select">Hauptgenre (100% Potenzial):</label>
+                            <select id="main-genre-select" class="input-field">
+                                <!-- Dynamisch befüllt -->
+                            </select>
+                        </div>
 
-    let mouth = "  |       [===]     |  ";
-    if (mouthType === "black") mouth = "  |       [███]     |  ";
-    if (mouthType === "piercing") mouth = "  |      o[===]o    |  ";
-    if (mouthType === "mask") mouth = "  |    [=X=X=X=X=]  |  ";
-    if (mouthType === "neutral") mouth = "  |        ---      |  ";
+                        <div class="form-group">
+                            <label for="layer-hair">Frisur & Schnitt:</label>
+                            <select id="layer-hair" class="input-field" onchange="renderCustomAvatar()">
+                                <option value="trad">Toupierte Mähne / Spikes</option>
+                                <option value="postpunk">Asymmetrischer Bob</option>
+                                <option value="spikes">Hoher Irokesen / Deathhawk</option>
+                                <option value="cyberdreads">Dreadlocks / Falls</option>
+                                <option value="buzz">Buzzcut / Undercut</option>
+                            </select>
+                        </div>
 
-    let neck = "  \\        ||       /  ";
-    let collar = "   \\___[======]___/   ";
-    if (accType === "choker") collar = "   \\___[==+-+=]___/   ";
+                        <div class="form-group">
+                            <label for="layer-brows">Augenbrauen:</label>
+                            <select id="layer-brows" class="input-field" onchange="renderCustomAvatar()">
+                                <option value="heavy">Gerade dicke Goth-Brauen</option>
+                                <option value="arch">Steile Hochgezogene Brauen</option>
+                                <option value="pierced">Gepiercte Brauen</option>
+                                <option value="none">Rasierte / Keine Brauen</option>
+                            </select>
+                        </div>
 
-    const asciiArt = [
-        ...hairLines,
-        brows,
-        eyes,
-        nose,
-        mouth,
-        neck,
-        collar,
-        "  /                 \\  ",
-        " /                   \\ "
-    ].join("\n");
+                        <div class="form-group">
+                            <label for="layer-eyes">Augen & Makeup:</label>
+                            <select id="layer-eyes" class="input-field" onchange="renderCustomAvatar()">
+                                <option value="heavy">Heavy Winged Eyeliner</option>
+                                <option value="cateye">Cat-Eye mit dunklem Schatten</option>
+                                <option value="smudge">Verlaufene Schminke (Smudge)</option>
+                                <option value="visor">Cyber-Visor / Brille</option>
+                            </select>
+                        </div>
 
-    const previewBox = document.getElementById("ascii-avatar-preview");
-    if (previewBox) {
-        previewBox.textContent = asciiArt;
-    }
+                        <div class="form-group">
+                            <label for="layer-mouth">Mund & Lippenstift:</label>
+                            <select id="layer-mouth" class="input-field" onchange="renderCustomAvatar()">
+                                <option value="black">Dunkle / Schminke Lippen</option>
+                                <option value="piercing">Snakebites / Piercing</option>
+                                <option value="mask">Atemschutzmaske / Respirator</option>
+                                <option value="neutral">Neutraler Ausdruck</option>
+                            </select>
+                        </div>
 
-    const profileBox = document.getElementById("profile-ascii-display");
-    if (profileBox) {
-        profileBox.textContent = asciiArt;
-    }
-}
+                        <div class="form-group">
+                            <label for="layer-acc">Accessoires:</label>
+                            <select id="layer-acc" class="input-field" onchange="renderCustomAvatar()">
+                                <option value="none">Keine</option>
+                                <option value="sunglasses">Dunkle Sonnenbrille</option>
+                                <option value="choker">Nieten-Choker</option>
+                            </select>
+                        </div>
+                    </div>
 
-function updateUI() {
-    document.getElementById("date-display").innerText = getFormattedDate();
-    document.getElementById("cash-display").innerText = gameState.cash;
-    document.getElementById("rep-display").innerText = gameState.rep;
-    document.getElementById("skill-display").innerText = gameState.skill;
-    
-    document.getElementById("energy-text").innerText = `${gameState.energy}%`;
-    document.getElementById("energy-bar").style.width = `${gameState.energy}%`;
-}
+                    <div class="preview-area">
+                        <pre id="ascii-avatar-preview" class="ascii-art-container"></pre>
+                        <span class="preview-label">ASCII-VORSCHAU (MONOCHROM)</span>
+                    </div>
+                </div>
+
+                <div class="action-footer">
+                    <button class="btn btn-primary" onclick="finishCharacterSetup()">[ KARRIERE STARTEN ]</button>
+                </div>
+            </section>
+
+            <!-- SCREEN 2: POSTEINGANG (INBOX / GIG-OFFERS) -->
+            <section id="screen-inbox" class="view-screen">
+                <div class="screen-header">
+                    <h2>◆ INBOX // EINGEGANGENE NACHRICHTEN & GIGS ◆</h2>
+                </div>
+
+                <div class="inbox-layout">
+                    <div class="mail-list-panel">
+                        <table class="mail-table">
+                            <thead>
+                                <tr>
+                                    <th>ABSENDER</th>
+                                    <th>BETREFF</th>
+                                    <th>DATUM</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mail-list-body">
+                                <!-- Dynamisch via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mail-reader-panel" id="mail-reader">
+                        <div class="mail-placeholder">
+                            Wähle eine Nachricht aus der Liste links aus, um sie zu lesen.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SCREEN 3: DASHBOARD & SETLIST -->
+            <section id="screen-dashboard" class="view-screen">
+                <div class="screen-header">
+                    <h2>◆ SETLIST EDITOR (25 SLOTS) ◆</h2>
+                </div>
+
+                <div class="dashboard-content">
+                    <div id="setlist-slots" class="setlist-grid">
+                        <!-- 25 Slots via JS -->
+                    </div>
+                </div>
+
+                <div class="action-footer">
+                    <button class="btn btn-primary" id="btn-play-gig" onclick="playBookedGig()" style="display: none;">[ GIG JETZT SPILEN! ]</button>
+                    <button class="btn" onclick="nextDay()">[ NÄCHSTER TAG ]</button>
+                </div>
+            </section>
+
+            <!-- SCREEN 4: GIG EVALUATION & FEEDBACK -->
+            <section id="screen-eval" class="view-screen">
+                <div class="screen-header">
+                    <h2>◆ PERFORMANCE EVALUATION // RECAP ◆</h2>
+                </div>
+
+                <div class="eval-layout">
+                    <div class="eval-stats-box" id="eval-stats">
+                        <!-- Stats via JS -->
+                    </div>
+
+                    <div class="eval-feedback-box">
+                        <div class="rack-header">
+                            <span class="rack-title">[ PUBLIKUMS-FEEDBACK & REVIEW ]</span>
+                        </div>
+                        <div id="eval-comments" class="comments-list">
+                            <!-- Kommentare via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-footer">
+                    <button class="btn btn-primary" onclick="finishGigEvaluation()">[ ZURÜCK ZUR INBOX ]</button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- RECHTES STATUS-RACK -->
+        <aside class="side-rack right-rack">
+            <div class="rack-header">
+                <span class="rack-title">[ GEBUCHTER GIG ]</span>
+            </div>
+
+            <div class="booked-gig-box" id="booked-gig-info">
+                <p class="text-muted">Kein Gig gebucht.</p>
+            </div>
+
+            <div class="rack-header">
+                <span class="rack-title">[ GENRE-LEGENDE ]</span>
+            </div>
+            
+            <div class="genre-info-list">
+                <div class="info-item"><strong>Batcave:</strong> Deathrock & Post-Punk</div>
+                <div class="info-item"><strong>Darkwave:</strong> Synthesizer & Coldwave</div>
+                <div class="info-item"><strong>Minimal Wave / NDW:</strong> Minimal Electronic</div>
+                <div class="info-item"><strong>EBM / Industrial:</strong> Harte Beats & Cyber</div>
+                <div class="info-item"><strong>Synthpop / New Wave:</strong> 80s Club Hits</div>
+            </div>
+
+            <div class="rack-header">
+                <span class="rack-title">[ CONTROLS ]</span>
+            </div>
+
+            <div class="control-hints">
+                <p>• Checke deine Mails nach Auftritten.</p>
+                <p>• Passe deine 25-Slot Setlist an das Club-Publikum an.</p>
+                <p>• Achte auf die Energie deines DJs.</p>
+            </div>
+        </aside>
+
+        <!-- UNTERES LOG-PANEL -->
+        <footer class="bottom-log-console">
+            <div class="log-header">
+                <span>SYSTEM LOG // CONSOLE OUTPUT</span>
+            </div>
+            <div id="log-entries" class="log-entries">
+                <!-- Log-Einträge via JS -->
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
