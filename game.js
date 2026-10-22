@@ -17,7 +17,7 @@ let gameState = {
     rep: 0,
     skill: 10,
     energy: 100,
-    setlist: new Array(25).fill("batcave"),
+    setlist: new Array(10).fill("batcave"), // Reduziert auf 10 Slots!
     mails: [],
     bookedGig: null
 };
@@ -115,7 +115,6 @@ function switchScreen(screenId) {
         target.classList.add("active");
     }
 
-    // Nav Buttons Highlighten
     document.querySelectorAll(".nav-btn").forEach(btn => {
         btn.classList.remove("active");
         if (btn.getAttribute("onclick")?.includes(screenId)) {
@@ -205,7 +204,7 @@ function updateBookedGigDisplay() {
     }
 }
 
-// SETLIST EVALUATION & PERFORMANCE ENGINE
+// SETLIST EVALUATION & PERFORMANCE ENGINE (ANGEPASST AUF 10 SLOTS)
 function playBookedGig() {
     if (!gameState.bookedGig) return;
     if (gameState.energy < 30) {
@@ -216,20 +215,18 @@ function playBookedGig() {
     const gig = gameState.bookedGig;
     gameState.energy -= 30;
 
-    // Genres der Setlist zählen
     let genreCounts = {};
     SUBGENRES_DATA.forEach(g => genreCounts[g.id] = 0);
     gameState.setlist.forEach(g => {
         if (genreCounts[g] !== undefined) genreCounts[g]++;
     });
 
-    // Score Berechnen
     let totalScore = 0;
     let comments = [];
 
-    // Erwartete Genres prüfen
+    // Erwartete Genres prüfen (auf Basis von 10 Tracks)
     Object.keys(gig.targetGenres).forEach(gId => {
-        const ratio = (genreCounts[gId] || 0) / 25;
+        const ratio = (genreCounts[gId] || 0) / 10;
         const targetRatio = gig.targetGenres[gId];
         if (ratio >= targetRatio) {
             totalScore += 40;
@@ -238,9 +235,9 @@ function playBookedGig() {
         }
     });
 
-    // Unerwünschte Genres prüfen (Abzug + Gästebuch-Kommentar)
+    // Unerwünschte Genres prüfen (ab 2 Tracks Abzug)
     gig.dislikedGenres.forEach(dId => {
-        if (genreCounts[dId] > 3) {
+        if (genreCounts[dId] >= 2) {
             totalScore -= 25;
             const genreName = SUBGENRES_DATA.find(g => g.id === dId)?.name;
             comments.push({
@@ -250,12 +247,11 @@ function playBookedGig() {
         }
     });
 
-    // Hauptgenre Bonus
-    if (genreCounts[gameState.mainGenre] >= 5) {
+    // Hauptgenre Bonus (ab 2 Tracks im Hauptgenre)
+    if (genreCounts[gameState.mainGenre] >= 2) {
         totalScore += 15;
     }
 
-    // Ergebnis auswerten
     let rating = "MÄSSIG";
     if (totalScore >= 70) rating = "PERFEKT!";
     else if (totalScore >= 45) rating = "SOLIDE";
@@ -272,7 +268,6 @@ function playBookedGig() {
         });
     }
 
-    // Belohnungen
     const finalCash = rating === "PERFEKT!" ? gig.pay + 30 : gig.pay;
     const finalRep = rating === "PERFEKT!" ? gig.repReward + 5 : gig.repReward;
 
@@ -282,10 +277,8 @@ function playBookedGig() {
 
     addLog(`Gig absolviert! Ergebnis: ${rating} (+${finalCash}€, +${finalRep} Rep)`);
 
-    // Results in Eval-Screen rendern
     renderEvalScreen(gig, rating, totalScore, finalCash, finalRep, comments);
     
-    // Gig zurücksetzen
     gameState.bookedGig = null;
     updateBookedGigDisplay();
     switchScreen("screen-eval");
