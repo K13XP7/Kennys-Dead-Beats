@@ -50,7 +50,7 @@ const INITIAL_MAILS = [
     }
 ];
 
-// WEBAUDIO C64 SOUND-ENGINE (SID-SYNTHESIZER)
+// WEBAUDIO C64 / CHIPTUNE BEAT ENGINE (ANGEPASST AN DEINEN SOUND)
 let audioCtx = null;
 
 function getAudioContext() {
@@ -63,65 +63,62 @@ function getAudioContext() {
     return audioCtx;
 }
 
-// SPIELT EINEN GENRE-TON IN EINER INTEGRATED MELDODIE / HARMONIE
-function playC64MixNote(genreId, pitchOffset, isBadTransition) {
+// ERZEUGT EINEN DRÜCKENDEN 8-BIT / CHIPTUNE BEAT-SCHRITT
+function playC64BeatStep(genreId, step, isBadTransition) {
     const ctx = getAudioContext();
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    
+    // 1. Kick / Bass Drum (immer auf die Hauptschläge 0, 4, 8, 12)
+    if (step % 4 === 0) {
+        const kickOsc = ctx.createOscillator();
+        const kickGain = ctx.createGain();
+        kickOsc.type = "square";
+        kickOsc.frequency.setValueAtTime(130, now);
+        kickOsc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+        kickGain.gain.setValueAtTime(0.35, now);
+        kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        kickOsc.connect(kickGain);
+        kickGain.connect(ctx.destination);
+        kickOsc.start(now);
+        kickOsc.stop(now + 0.15);
+    }
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+    // 2. Genre-typische Melodie- / Bassline-Sequenz im Stil deiner Hörprobe
+    const leadOsc = ctx.createOscillator();
+    const leadGain = ctx.createGain();
+    leadOsc.connect(leadGain);
+    leadGain.connect(ctx.destination);
 
-    // Wenn der Übergang schlecht ist -> Verstimmte, schräge Töne (Disharmonie)
-    const dissonance = isBadTransition ? (Math.random() > 0.5 ? 35 : -40) : 0;
+    // Disharmonie bei schlechtem Übergang einstreuen
+    const discord = isBadTransition ? (Math.random() > 0.4 ? 45 : -35) : 0;
 
+    let notes = [110, 220, 164, 196]; // Standard Bassfolge
     if (genreId === "batcave") {
-        osc.type = "square";
-        osc.frequency.setValueAtTime((220 + pitchOffset) + dissonance, now);
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        leadOsc.type = "sawtooth";
+        notes = [146.83, 174.61, 220, 196]; // D-Moll Vibe
     } else if (genreId === "darkwave") {
-        osc.type = "sawtooth";
-        osc.frequency.setValueAtTime((110 + (pitchOffset / 2)) + dissonance, now);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+        leadOsc.type = "square";
+        notes = [110, 130.81, 164.81, 196]; // Düsterer Coldwave
     } else if (genreId === "minimal_ndw") {
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime((440 + pitchOffset) + dissonance, now);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+        leadOsc.type = "triangle";
+        notes = [220, 261.63, 329.63, 261.63]; // Monoton & Minimal
     } else if (genreId === "ebm_industrial") {
-        osc.type = "square";
-        osc.frequency.setValueAtTime(120 + dissonance, now);
-        osc.frequency.exponentialRampToValueAtTime(30, now + 0.2);
-        gain.gain.setValueAtTime(0.25, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        leadOsc.type = "square";
+        notes = [98.00, 98.00, 123.47, 110]; // Hart & Stampfend
     } else if (genreId === "synthpop") {
-        osc.type = "square";
-        osc.frequency.setValueAtTime((330 + pitchOffset) + dissonance, now);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        leadOsc.type = "square";
+        notes = [261.63, 329.63, 392.00, 523.25]; // Melodisch 80s
     }
 
-    osc.start(now);
-    osc.stop(now + 0.38);
-
-    // Bei extrem schlechtem Übergang zusätzlicher Scratch/Buzzer-Sound
-    if (isBadTransition && Math.random() > 0.6) {
-        const noiseOsc = ctx.createOscillator();
-        const noiseGain = ctx.createGain();
-        noiseOsc.type = "sawtooth";
-        noiseOsc.frequency.setValueAtTime(80, now);
-        noiseGain.gain.setValueAtTime(0.2, now);
-        noiseGain.gain.linearRampToValueAtTime(0.001, now + 0.15);
-        noiseOsc.connect(noiseGain);
-        noiseGain.connect(ctx.destination);
-        noiseOsc.start(now);
-        noiseOsc.stop(now + 0.15);
-    }
+    const freq = notes[step % notes.length] + discord;
+    leadOsc.frequency.setValueAtTime(freq, now);
+    leadGain.gain.setValueAtTime(0.18, now);
+    leadGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    
+    leadOsc.start(now);
+    leadOsc.stop(now + 0.22);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -278,7 +275,7 @@ function updateBookedGigDisplay() {
     }
 }
 
-// 4-SEKUNDEN DJ-MIX SIMULATION WITH DYNAMIC C64 SOUNDS
+// VERBESSERTE RHYTHMISCHE CLUB-MIX SIMULATION (CA. 8-10 SEKUNDEN GESAMTLÄUFE)
 function playBookedGig() {
     if (!gameState.bookedGig) return;
     if (gameState.energy < 30) {
@@ -289,30 +286,25 @@ function playBookedGig() {
     const gig = gameState.bookedGig;
     gameState.energy -= 30;
 
-    addLog(`🎛 ${gameState.djName} startet den Mix auf den Turntables...`);
+    addLog(`🎛 ${gameState.djName} startet das Set auf den Decks... (Beat-Mix läuft)`);
 
     let step = 0;
-    const totalSteps = 16; // 16 Beats über 4 Sekunden (alle 250ms ein Takt)
-    const scalePitches = [0, 40, 70, 110, 140, 180, 220, 260];
+    const totalSteps = 32; // 32 Beats = ca. 8-10 Sekunden treibender Groove!
 
     const mixInterval = setInterval(() => {
         if (step < totalSteps) {
-            // Mappe Step (0-15) auf die 10 Setlist-Tracks
             const trackIndex = Math.floor((step / totalSteps) * gameState.setlist.length);
             const currentGenre = gameState.setlist[trackIndex];
-            const prevGenre = trackIndex > 0 ? gameState.setlist[trackIndex - 1] : currentGenre;
-
-            // Ist es ein ungeliebter Genre-Wechsel für diesen Club?
+            
+            // Prüfen, ob der Club diesen Track mag
             const isDisliked = gig.dislikedGenres.includes(currentGenre);
             
-            // C64 Ton abspielen
-            const pitch = scalePitches[step % scalePitches.length];
-            playC64MixNote(currentGenre, pitch, isDisliked);
+            playC64BeatStep(currentGenre, step, isDisliked);
 
-            // Visueller Log-Effekt im Terminal
-            if (step % 4 === 0) {
-                const beatBars = "█".repeat((step / 4) + 1) + "░".repeat(4 - ((step / 4) + 1));
-                addLog(`[MIXING] Track ${trackIndex + 1}/10: ${SUBGENRES_DATA.find(g => g.id === currentGenre)?.name} [${beatBars}]`);
+            if (step % 8 === 0) {
+                const progressBars = "█".repeat((step / 8) + 1) + "░".repeat(4 - ((step / 8) + 1));
+                const genreName = SUBGENRES_DATA.find(g => g.id === currentGenre)?.name;
+                addLog(`[LIVE MIX] Track ${trackIndex + 1}/10 (${genreName}) [${progressBars}]`);
             }
 
             step++;
@@ -320,7 +312,7 @@ function playBookedGig() {
             clearInterval(mixInterval);
             finishPlayBookedGig(gig);
         }
-    }, 250); // 16 Steps * 250ms = Genau 4,0 Sekunden Mixdauer!
+    }, 280); // 32 Steps * 280ms = ca. 9 Sekunden knackiger Club-Sound!
 }
 
 function finishPlayBookedGig(gig) {
@@ -333,7 +325,6 @@ function finishPlayBookedGig(gig) {
     let totalScore = 0;
     let comments = [];
 
-    // Erwartete Genres prüfen
     Object.keys(gig.targetGenres).forEach(gId => {
         const ratio = (genreCounts[gId] || 0) / 10;
         const targetRatio = gig.targetGenres[gId];
@@ -344,7 +335,6 @@ function finishPlayBookedGig(gig) {
         }
     });
 
-    // Unerwünschte Genres prüfen
     gig.dislikedGenres.forEach(dId => {
         if (genreCounts[dId] >= 2) {
             totalScore -= 25;
@@ -356,7 +346,6 @@ function finishPlayBookedGig(gig) {
         }
     });
 
-    // Hauptgenre Bonus
     if (genreCounts[gameState.mainGenre] >= 2) {
         totalScore += 15;
     }
