@@ -17,7 +17,7 @@ let gameState = {
     rep: 0,
     skill: 10,
     energy: 100,
-    setlist: new Array(10).fill("batcave"), // Reduziert auf 10 Slots!
+    setlist: new Array(10).fill("batcave"),
     mails: [],
     bookedGig: null
 };
@@ -49,6 +49,80 @@ const INITIAL_MAILS = [
         dislikedGenres: ["ebm_industrial", "minimal_ndw"]
     }
 ];
+
+// WEBAUDIO C64 SOUND-ENGINE (SID-SYNTHESIZER)
+let audioCtx = null;
+
+function getAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+// SPIELT EINEN GENRE-TON IN EINER INTEGRATED MELDODIE / HARMONIE
+function playC64MixNote(genreId, pitchOffset, isBadTransition) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    // Wenn der Übergang schlecht ist -> Verstimmte, schräge Töne (Disharmonie)
+    const dissonance = isBadTransition ? (Math.random() > 0.5 ? 35 : -40) : 0;
+
+    if (genreId === "batcave") {
+        osc.type = "square";
+        osc.frequency.setValueAtTime((220 + pitchOffset) + dissonance, now);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    } else if (genreId === "darkwave") {
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime((110 + (pitchOffset / 2)) + dissonance, now);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+    } else if (genreId === "minimal_ndw") {
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime((440 + pitchOffset) + dissonance, now);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+    } else if (genreId === "ebm_industrial") {
+        osc.type = "square";
+        osc.frequency.setValueAtTime(120 + dissonance, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.2);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    } else if (genreId === "synthpop") {
+        osc.type = "square";
+        osc.frequency.setValueAtTime((330 + pitchOffset) + dissonance, now);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    }
+
+    osc.start(now);
+    osc.stop(now + 0.38);
+
+    // Bei extrem schlechtem Übergang zusätzlicher Scratch/Buzzer-Sound
+    if (isBadTransition && Math.random() > 0.6) {
+        const noiseOsc = ctx.createOscillator();
+        const noiseGain = ctx.createGain();
+        noiseOsc.type = "sawtooth";
+        noiseOsc.frequency.setValueAtTime(80, now);
+        noiseGain.gain.setValueAtTime(0.2, now);
+        noiseGain.gain.linearRampToValueAtTime(0.001, now + 0.15);
+        noiseOsc.connect(noiseGain);
+        noiseGain.connect(ctx.destination);
+        noiseOsc.start(now);
+        noiseOsc.stop(now + 0.15);
+    }
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     gameState.mails = [...INITIAL_MAILS];
@@ -204,7 +278,7 @@ function updateBookedGigDisplay() {
     }
 }
 
-// SETLIST EVALUATION & PERFORMANCE ENGINE (ANGEPASST AUF 10 SLOTS)
+// 4-SEKUNDEN DJ-MIX SIMULATION WITH DYNAMIC C64 SOUNDS
 function playBookedGig() {
     if (!gameState.bookedGig) return;
     if (gameState.energy < 30) {
@@ -215,6 +289,41 @@ function playBookedGig() {
     const gig = gameState.bookedGig;
     gameState.energy -= 30;
 
+    addLog(`🎛 ${gameState.djName} startet den Mix auf den Turntables...`);
+
+    let step = 0;
+    const totalSteps = 16; // 16 Beats über 4 Sekunden (alle 250ms ein Takt)
+    const scalePitches = [0, 40, 70, 110, 140, 180, 220, 260];
+
+    const mixInterval = setInterval(() => {
+        if (step < totalSteps) {
+            // Mappe Step (0-15) auf die 10 Setlist-Tracks
+            const trackIndex = Math.floor((step / totalSteps) * gameState.setlist.length);
+            const currentGenre = gameState.setlist[trackIndex];
+            const prevGenre = trackIndex > 0 ? gameState.setlist[trackIndex - 1] : currentGenre;
+
+            // Ist es ein ungeliebter Genre-Wechsel für diesen Club?
+            const isDisliked = gig.dislikedGenres.includes(currentGenre);
+            
+            // C64 Ton abspielen
+            const pitch = scalePitches[step % scalePitches.length];
+            playC64MixNote(currentGenre, pitch, isDisliked);
+
+            // Visueller Log-Effekt im Terminal
+            if (step % 4 === 0) {
+                const beatBars = "█".repeat((step / 4) + 1) + "░".repeat(4 - ((step / 4) + 1));
+                addLog(`[MIXING] Track ${trackIndex + 1}/10: ${SUBGENRES_DATA.find(g => g.id === currentGenre)?.name} [${beatBars}]`);
+            }
+
+            step++;
+        } else {
+            clearInterval(mixInterval);
+            finishPlayBookedGig(gig);
+        }
+    }, 250); // 16 Steps * 250ms = Genau 4,0 Sekunden Mixdauer!
+}
+
+function finishPlayBookedGig(gig) {
     let genreCounts = {};
     SUBGENRES_DATA.forEach(g => genreCounts[g.id] = 0);
     gameState.setlist.forEach(g => {
@@ -224,7 +333,7 @@ function playBookedGig() {
     let totalScore = 0;
     let comments = [];
 
-    // Erwartete Genres prüfen (auf Basis von 10 Tracks)
+    // Erwartete Genres prüfen
     Object.keys(gig.targetGenres).forEach(gId => {
         const ratio = (genreCounts[gId] || 0) / 10;
         const targetRatio = gig.targetGenres[gId];
@@ -235,7 +344,7 @@ function playBookedGig() {
         }
     });
 
-    // Unerwünschte Genres prüfen (ab 2 Tracks Abzug)
+    // Unerwünschte Genres prüfen
     gig.dislikedGenres.forEach(dId => {
         if (genreCounts[dId] >= 2) {
             totalScore -= 25;
@@ -247,7 +356,7 @@ function playBookedGig() {
         }
     });
 
-    // Hauptgenre Bonus (ab 2 Tracks im Hauptgenre)
+    // Hauptgenre Bonus
     if (genreCounts[gameState.mainGenre] >= 2) {
         totalScore += 15;
     }
