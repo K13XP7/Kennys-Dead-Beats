@@ -50,7 +50,7 @@ const INITIAL_MAILS = [
     }
 ];
 
-// WEBAUDIO C64 / CHIPTUNE BEAT ENGINE (ANGEPASST AN DEINEN SOUND)
+// WEBAUDIO C64 / CHIPTUNE BEAT ENGINE
 let audioCtx = null;
 
 function getAudioContext() {
@@ -63,62 +63,61 @@ function getAudioContext() {
     return audioCtx;
 }
 
-// ERZEUGT EINEN DRÜCKENDEN 8-BIT / CHIPTUNE BEAT-SCHRITT
-function playC64BeatStep(genreId, step, isBadTransition) {
+// SPIELT EINEN SPEZIFISCHEN TRACK-TAKT AB (ANGEPASST AN DAS GENRE)
+function playTrackBeatStep(genreId, step, isBadTransition) {
     const ctx = getAudioContext();
     if (!ctx) return;
 
     const now = ctx.currentTime;
     
-    // 1. Kick / Bass Drum (immer auf die Hauptschläge 0, 4, 8, 12)
-    if (step % 4 === 0) {
+    // Wuchtige 8-Bit Kick-Drum auf den Hauptschlägen
+    if (step % 2 === 0) {
         const kickOsc = ctx.createOscillator();
         const kickGain = ctx.createGain();
         kickOsc.type = "square";
-        kickOsc.frequency.setValueAtTime(130, now);
-        kickOsc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
-        kickGain.gain.setValueAtTime(0.35, now);
-        kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        kickOsc.frequency.setValueAtTime(140, now);
+        kickOsc.frequency.exponentialRampToValueAtTime(25, now + 0.15);
+        kickGain.gain.setValueAtTime(0.4, now);
+        kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
         kickOsc.connect(kickGain);
         kickGain.connect(ctx.destination);
         kickOsc.start(now);
-        kickOsc.stop(now + 0.15);
+        kickOsc.stop(now + 0.18);
     }
 
-    // 2. Genre-typische Melodie- / Bassline-Sequenz im Stil deiner Hörprobe
+    // Charakteristische Melodie / Bassline je Genre
     const leadOsc = ctx.createOscillator();
     const leadGain = ctx.createGain();
     leadOsc.connect(leadGain);
     leadGain.connect(ctx.destination);
 
-    // Disharmonie bei schlechtem Übergang einstreuen
-    const discord = isBadTransition ? (Math.random() > 0.4 ? 45 : -35) : 0;
+    const discord = isBadTransition ? (Math.random() > 0.4 ? 50 : -45) : 0;
+    let notes = [110, 164, 220, 196];
 
-    let notes = [110, 220, 164, 196]; // Standard Bassfolge
     if (genreId === "batcave") {
         leadOsc.type = "sawtooth";
-        notes = [146.83, 174.61, 220, 196]; // D-Moll Vibe
+        notes = [130.81, 164.81, 196.00, 246.94]; // Dunkles Post-Punk Arpeggio
     } else if (genreId === "darkwave") {
         leadOsc.type = "square";
-        notes = [110, 130.81, 164.81, 196]; // Düsterer Coldwave
+        notes = [98.00, 116.54, 146.83, 174.61]; // Hypnotisch & Synth-lastig
     } else if (genreId === "minimal_ndw") {
         leadOsc.type = "triangle";
-        notes = [220, 261.63, 329.63, 261.63]; // Monoton & Minimal
+        notes = [220, 261.63, 220, 329.63]; // Monotoner, kühler NDW-Loop
     } else if (genreId === "ebm_industrial") {
         leadOsc.type = "square";
-        notes = [98.00, 98.00, 123.47, 110]; // Hart & Stampfend
+        notes = [82.41, 92.50, 82.41, 110.00]; // Hart, treibend, stampfend
     } else if (genreId === "synthpop") {
         leadOsc.type = "square";
-        notes = [261.63, 329.63, 392.00, 523.25]; // Melodisch 80s
+        notes = [261.63, 329.63, 392.00, 523.25]; // Melodiöser 80er Pop-Akkord
     }
 
     const freq = notes[step % notes.length] + discord;
     leadOsc.frequency.setValueAtTime(freq, now);
     leadGain.gain.setValueAtTime(0.18, now);
-    leadGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    leadGain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
     
     leadOsc.start(now);
-    leadOsc.stop(now + 0.22);
+    leadOsc.stop(now + 0.25);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -275,7 +274,7 @@ function updateBookedGigDisplay() {
     }
 }
 
-// VERBESSERTE RHYTHMISCHE CLUB-MIX SIMULATION (CA. 8-10 SEKUNDEN GESAMTLÄUFE)
+// 10 SEKUNDEN PRO TRACK -> 10 TRACKS = CA. 100 SEKUNDEN VOLLSTÄNDIGES LIVE-SET!
 function playBookedGig() {
     if (!gameState.bookedGig) return;
     if (gameState.energy < 30) {
@@ -286,33 +285,37 @@ function playBookedGig() {
     const gig = gameState.bookedGig;
     gameState.energy -= 30;
 
-    addLog(`🎛 ${gameState.djName} startet das Set auf den Decks... (Beat-Mix läuft)`);
+    addLog(`🎛 ${gameState.djName} legt auf! Das 10-Track Live-Set läuft...`);
 
-    let step = 0;
-    const totalSteps = 32; // 32 Beats = ca. 8-10 Sekunden treibender Groove!
+    let currentTrackIndex = 0;
+    let beatInTrack = 0;
+    const beatsPerTrack = 25; // 25 Takte à 400ms = Genau 10 Sekunden pro Track!
 
-    const mixInterval = setInterval(() => {
-        if (step < totalSteps) {
-            const trackIndex = Math.floor((step / totalSteps) * gameState.setlist.length);
-            const currentGenre = gameState.setlist[trackIndex];
-            
-            // Prüfen, ob der Club diesen Track mag
-            const isDisliked = gig.dislikedGenres.includes(currentGenre);
-            
-            playC64BeatStep(currentGenre, step, isDisliked);
+    const playLoop = setInterval(() => {
+        if (currentTrackIndex < gameState.setlist.length) {
+            const genreId = gameState.setlist[currentTrackIndex];
+            const isDisliked = gig.dislikedGenres.includes(genreId);
 
-            if (step % 8 === 0) {
-                const progressBars = "█".repeat((step / 8) + 1) + "░".repeat(4 - ((step / 8) + 1));
-                const genreName = SUBGENRES_DATA.find(g => g.id === currentGenre)?.name;
-                addLog(`[LIVE MIX] Track ${trackIndex + 1}/10 (${genreName}) [${progressBars}]`);
+            playTrackBeatStep(genreId, beatInTrack, isDisliked);
+
+            // Log-Update bei Start eines neuen Tracks (alle 10 Sek)
+            if (beatInTrack === 0) {
+                const genreName = SUBGENRES_DATA.find(g => g.id === genreId)?.name;
+                addLog(`▶ [TRACK ${currentTrackIndex + 1}/10] Läuft: ${genreName}`);
             }
 
-            step++;
+            beatInTrack++;
+
+            // Wenn die 10 Sekunden (25 Takte) des aktuellen Tracks vorbei sind -> zum nächsten Track
+            if (beatInTrack >= beatsPerTrack) {
+                beatInTrack = 0;
+                currentTrackIndex++;
+            }
         } else {
-            clearInterval(mixInterval);
+            clearInterval(playLoop);
             finishPlayBookedGig(gig);
         }
-    }, 280); // 32 Steps * 280ms = ca. 9 Sekunden knackiger Club-Sound!
+    }, 400); // 400ms pro Takt sorgt für einen coolen, groovigen Club-BPM
 }
 
 function finishPlayBookedGig(gig) {
